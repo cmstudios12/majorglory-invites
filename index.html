@@ -1,0 +1,2261 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#070707">
+  <meta name="description" content="Let's Dine Nico's Birthday Celebration at Deja Vu Restaurant, Nelspruit.">
+  <title>Let's Dine Nico's Birthday Celebration</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       RESET
+    ========================================================= */
+    *,*::before,*::after{box-sizing:border-box}
+    html{width:100%;min-height:100%;-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      width:100%;
+      min-height:100dvh;
+      overflow:hidden;
+      color:var(--white);
+      background:var(--black);
+      font-family:"DM Sans",sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+    button,input,select,textarea{font:inherit}
+    button{border:0}
+    img,svg{display:block;max-width:100%}
+    [hidden]{display:none!important}
+    ::selection{background:var(--gold);color:#111}
+    :focus-visible{outline:2px solid #c6a15b;outline-offset:4px}
+
+    /* =========================================================
+       THEME
+    ========================================================= */
+    :root{
+      --black:#070707;
+      --black-2:#0f0f0f;
+      --black-3:#171717;
+      --ivory:#f5f0e7;
+      --ivory-2:#e9dfcf;
+      --gold:#c9a464;
+      --gold-soft:#e3c58c;
+      --white:#ffffff;
+      --muted:#a7a098;
+      --charcoal:#111111;
+      --danger:#a54f5d;
+      --success:#657663;
+      --line:rgba(201,164,100,.25);
+
+      /* Legacy aliases keep the staged design consistent with the source page palette */
+      --wine:var(--black);
+      --wine-deep:#020202;
+      --burgundy:var(--black-2);
+      --burgundy-soft:var(--black-3);
+      --gold-warm:var(--gold-soft);
+      --gold-pale:#f0dfbc;
+      --cream:var(--ivory-2);
+      --cream-deep:#d9ccb7;
+      --rose:#cbb9a4;
+      --ease-luxury:cubic-bezier(.22,1,.36,1);
+      --ease-soft:cubic-bezier(.4,0,.2,1);
+      --safe-top:max(18px,env(safe-area-inset-top));
+      --safe-right:max(16px,env(safe-area-inset-right));
+      --safe-bottom:max(18px,env(safe-area-inset-bottom));
+      --safe-left:max(16px,env(safe-area-inset-left));
+    }
+
+    .app{
+      position:relative;
+      width:100%;
+      height:100dvh;
+      overflow:hidden;
+      isolation:isolate;
+      background:var(--ivory);
+    }
+    .grain{
+      position:fixed;
+      inset:0;
+      z-index:2000;
+      pointer-events:none;
+      opacity:.032;
+      mix-blend-mode:multiply;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='4' stitchTiles='stitchTiles'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    }
+    .scene{
+      position:absolute;
+      inset:0;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      min-height:100dvh;
+      padding:
+        calc(var(--safe-top) + 14px)
+        var(--safe-right)
+        calc(var(--safe-bottom) + 14px)
+        var(--safe-left);
+      overflow-x:hidden;
+      overflow-y:auto;
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+      transform:scale(1.018);
+      filter:blur(7px);
+      transition:
+        opacity .82s var(--ease-luxury),
+        transform .95s var(--ease-luxury),
+        filter .95s var(--ease-luxury),
+        visibility 0s linear .95s;
+    }
+    .scene.active{
+      z-index:5;
+      opacity:1;
+      visibility:visible;
+      pointer-events:auto;
+      transform:scale(1);
+      filter:blur(0);
+      transition-delay:0s;
+    }
+    .scene.exiting{opacity:0;transform:scale(.978);filter:blur(8px)}
+
+    .ambient{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .orb{
+      position:absolute;
+      width:min(52vw,560px);
+      aspect-ratio:1;
+      border-radius:50%;
+      filter:blur(12px);
+      opacity:.45;
+      animation:orbFloat 11s ease-in-out infinite alternate;
+    }
+    .orb.one{
+      left:-19%;
+      top:-22%;
+      background:radial-gradient(circle,rgba(216,187,123,.18),rgba(216,187,123,.02) 64%,transparent 72%);
+    }
+    .orb.two{
+      right:-20%;
+      bottom:-25%;
+      background:radial-gradient(circle,rgba(201,164,100,.08),rgba(201,164,100,.01) 62%,transparent 72%);
+      animation-delay:-4s;
+    }
+    .sparkles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+    .sparkle{
+      position:absolute;
+      width:4px;
+      height:4px;
+      border-radius:50%;
+      color:var(--gold);
+      background:currentColor;
+      opacity:.2;
+      box-shadow:0 0 12px rgba(198,161,91,.38);
+      animation:sparkleDrift var(--duration,8s) ease-in-out infinite alternate;
+      animation-delay:var(--delay,0s);
+    }
+    .sparkle::before,.sparkle::after{
+      content:"";
+      position:absolute;
+      left:50%;top:50%;
+      background:currentColor;
+      transform:translate(-50%,-50%);
+    }
+    .sparkle::before{width:1px;height:10px}
+    .sparkle::after{width:10px;height:1px}
+
+    .eyebrow{
+      margin:0;
+      color:var(--gold);
+      font-size:.69rem;
+      font-weight:600;
+      letter-spacing:.30em;
+      text-transform:uppercase;
+    }
+    .fine-rule{
+      width:min(290px,76vw);
+      margin-inline:auto;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .fine-rule::before,.fine-rule::after{
+      content:"";
+      flex:1;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(198,161,91,.8));
+    }
+    .fine-rule::after{background:linear-gradient(90deg,rgba(198,161,91,.8),transparent)}
+    .fine-rule span{
+      width:5px;height:5px;
+      border:1px solid var(--gold);
+      transform:rotate(45deg);
+    }
+
+    /* =========================================================
+       BUTTONS
+    ========================================================= */
+    .btn{
+      position:relative;
+      isolation:isolate;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:11px;
+      min-height:56px;
+      padding:0 28px;
+      overflow:hidden;
+      cursor:pointer;
+      color:#fff;
+      background:linear-gradient(135deg,var(--burgundy),var(--wine));
+      border:1px solid rgba(216,187,123,.82);
+      border-radius:999px;
+      font-size:.75rem;
+      font-weight:600;
+      letter-spacing:.17em;
+      text-transform:uppercase;
+      box-shadow:0 16px 36px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.15);
+      transition:transform .34s var(--ease-luxury),box-shadow .34s var(--ease-luxury),border-color .34s ease;
+    }
+    .btn::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      z-index:-1;
+      background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.15) 42%,rgba(216,187,123,.23) 50%,rgba(255,255,255,.07) 58%,transparent 80%);
+      transform:translateX(-135%);
+      transition:transform .9s var(--ease-luxury);
+    }
+    .btn:hover::before{transform:translateX(135%)}
+    .btn:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16)}
+    .btn:active{transform:translateY(0) scale(.985)}
+    .btn.large{width:min(100%,350px);min-height:62px}
+    .btn svg{width:18px;height:18px;transition:transform .34s var(--ease-luxury)}
+    .btn:hover svg{transform:translateX(4px)}
+    .ripple{
+      position:absolute;
+      z-index:10;
+      width:7px;height:7px;
+      pointer-events:none;
+      border:1px solid rgba(234,217,179,.94);
+      border-radius:50%;
+      transform:translate(-50%,-50%) scale(0);
+      animation:ripple .7s var(--ease-luxury) forwards;
+    }
+
+    /* =========================================================
+       CURTAINS
+    ========================================================= */
+    .curtain-stage{
+      position:fixed;
+      inset:0;
+      z-index:1500;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      background:radial-gradient(circle at 50% 42%,#1b1b1b 0%,#090909 58%,#020202 100%);
+      transition:opacity 1s ease,visibility 0s linear 1s;
+    }
+    .curtain-stage.gone{opacity:0;visibility:hidden;pointer-events:none}
+    .curtain-panel{
+      position:absolute;
+      top:0;bottom:0;
+      width:52.5vw;
+      min-width:52.5vw;
+      z-index:4;
+      overflow:hidden;
+      will-change:transform;
+      transition:transform 2.25s cubic-bezier(.64,0,.2,1),filter 2.25s ease;
+    }
+    .curtain-panel.left{left:0;transform-origin:left center}
+    .curtain-panel.right{right:0;transform-origin:right center}
+    .curtain-panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(90deg,
+          rgba(255,255,255,.06) 0%,
+          rgba(0,0,0,.18) 8%,
+          rgba(255,255,255,.04) 15%,
+          rgba(0,0,0,.25) 22%,
+          rgba(255,255,255,.05) 29%,
+          rgba(0,0,0,.22) 37%,
+          rgba(255,255,255,.05) 45%,
+          rgba(0,0,0,.25) 54%,
+          rgba(255,255,255,.045) 63%,
+          rgba(0,0,0,.26) 73%,
+          rgba(255,255,255,.04) 84%,
+          rgba(0,0,0,.23) 100%),
+        linear-gradient(180deg,#222222 0%,#141414 18%,#0d0d0d 58%,#050505 100%);
+    }
+    .curtain-panel::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(ellipse at 50% -8%,rgba(255,224,178,.18),transparent 34%),linear-gradient(180deg,transparent,rgba(0,0,0,.1) 52%,rgba(0,0,0,.36));
+    }
+    .curtain-panel.left::after{box-shadow:inset -30px 0 40px rgba(0,0,0,.38)}
+    .curtain-panel.right::after{box-shadow:inset 30px 0 40px rgba(0,0,0,.38)}
+    .curtain-stage.opened .curtain-panel.left{transform:translateX(-88%) scaleX(.86);filter:brightness(.82)}
+    .curtain-stage.opened .curtain-panel.right{transform:translateX(88%) scaleX(.86);filter:brightness(.82)}
+    .curtain-top{
+      position:absolute;
+      top:0;left:-3%;
+      width:106%;
+      height:clamp(82px,14vh,145px);
+      z-index:8;
+      border-bottom:2px solid rgba(216,187,123,.52);
+      background:
+        radial-gradient(ellipse at 7% 4%,#252525 0 25%,transparent 26%) 0 0/17% 100% repeat-x,
+        linear-gradient(180deg,#1b1b1b,#101010 58%,#050505);
+      box-shadow:0 18px 30px rgba(0,0,0,.35),inset 0 -9px 16px rgba(0,0,0,.28);
+      transform-origin:top;
+      transition:transform 2.1s var(--ease-luxury),opacity 1.5s ease;
+    }
+    .curtain-stage.opened .curtain-top{transform:translateY(-76%);opacity:.78}
+    .curtain-rail{
+      position:absolute;
+      top:clamp(77px,13.5vh,140px);
+      left:3%;width:94%;height:4px;
+      z-index:9;
+      background:linear-gradient(90deg,transparent,#8f6f38 7%,#ddc486 50%,#8f6f38 93%,transparent);
+      box-shadow:0 2px 6px rgba(0,0,0,.35);
+      transition:transform 2s var(--ease-luxury),opacity 1.6s ease;
+    }
+    .curtain-stage.opened .curtain-rail{transform:translateY(-110px);opacity:0}
+    .curtain-seam{
+      position:absolute;
+      top:0;bottom:0;left:50%;
+      width:2px;z-index:6;
+      background:linear-gradient(180deg,rgba(216,187,123,.08),rgba(0,0,0,.55),rgba(216,187,123,.06));
+      box-shadow:0 0 14px rgba(0,0,0,.4);
+      transform:translateX(-50%);
+      transition:opacity .5s ease;
+    }
+    .curtain-stage.opened .curtain-seam{opacity:0}
+    .curtain-vignette{
+      position:absolute;inset:0;z-index:10;pointer-events:none;
+      box-shadow:inset 0 0 130px rgba(0,0,0,.68),inset 0 0 25px rgba(0,0,0,.35);
+    }
+    .curtain-intro{
+      position:relative;
+      z-index:20;
+      width:min(560px,calc(100% - 34px));
+      padding:40px 16px;
+      text-align:center;
+      color:var(--ivory);
+      transition:opacity .8s ease,transform .9s var(--ease-luxury);
+    }
+    .curtain-stage.opened .curtain-intro{opacity:0;transform:translateY(-14px) scale(.97);pointer-events:none}
+    .curtain-monogram{
+      width:48px;height:48px;
+      margin:0 auto 25px;
+      display:grid;place-items:center;
+      border:1px solid rgba(216,187,123,.72);
+      transform:rotate(45deg);
+      color:var(--gold-warm);
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.45rem;
+      font-weight:600;
+    }
+    .curtain-monogram span{transform:rotate(-45deg)}
+    .curtain-intro .private{
+      margin:0 0 10px;
+      color:var(--gold-warm);
+      font-size:.65rem;
+      font-weight:600;
+      letter-spacing:.28em;
+      text-transform:uppercase;
+    }
+    .curtain-intro p{
+      margin:0 0 26px;
+      color:rgba(251,247,240,.73);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1rem,3.8vw,1.24rem);
+      font-style:italic;
+      letter-spacing:.025em;
+    }
+    .open-btn{
+      min-width:min(330px,94%);
+      min-height:63px;
+      background:linear-gradient(180deg,rgba(24,24,24,.98),rgba(5,5,5,.99));
+      animation:invitationPulse 2.8s ease-in-out infinite;
+    }
+
+    /* =========================================================
+       INVITATION HERO
+    ========================================================= */
+    #heroScene{
+      background:
+        radial-gradient(circle at 18% 18%,rgba(201,164,100,.12),transparent 30%),
+        radial-gradient(circle at 82% 78%,rgba(201,164,100,.08),transparent 28%),
+        var(--black);
+    }
+    .hero-shell{
+      position:relative;
+      width:min(900px,100%);
+      margin:auto;
+      text-align:center;
+    }
+    .floral{
+      position:absolute;
+      width:clamp(140px,24vw,260px);
+      opacity:.42;
+      pointer-events:none;
+    }
+    .floral.left{top:-24px;left:-22px;transform:rotate(-8deg)}
+    .floral.right{right:-20px;bottom:-28px;transform:rotate(172deg)}
+    .floral path{fill:none;stroke:rgba(201,164,100,.28);stroke-width:1.1;stroke-linecap:round}
+    .floral path.gold{stroke:rgba(227,197,140,.72)}
+    .hero-content{
+      position:relative;z-index:3;
+      width:min(760px,100%);
+      margin:auto;
+      padding:clamp(32px,7vw,70px) clamp(8px,4vw,38px);
+    }
+    .hero-kicker,.hero-copy,.hero-name,.hero-script,.hero-rule,.hero-note,.hero-action{
+      opacity:0;
+      transform:translateY(19px);
+    }
+    .hero-copy{
+      margin:18px 0 0;
+      color:#b9b1a8;
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1.24rem,4vw,2rem);
+      line-height:1.35;
+    }
+    .hero-name{
+      position:relative;
+      width:fit-content;
+      margin:2px auto 0;
+      color:var(--ivory);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(5rem,20vw,10.5rem);
+      font-weight:500;
+      line-height:.9;
+      letter-spacing:-.06em;
+    }
+    .hero-name::after{
+      content:"";
+      position:absolute;
+      left:14%;right:12%;bottom:-5px;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(198,161,91,.65),transparent);
+    }
+    .hero-script{
+      margin:19px 0 16px;
+      color:var(--gold-soft);
+      font-family:"Great Vibes",cursive;
+      font-size:clamp(2.6rem,9vw,5rem);
+      line-height:1;
+    }
+    .hero-note{
+      width:min(540px,94%);
+      margin:25px auto 0;
+      color:#9f9991;
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1.02rem,3.5vw,1.25rem);
+      font-style:italic;
+      line-height:1.68;
+    }
+    .hero-action{margin-top:34px}
+    #heroScene.active.revealed .hero-kicker{animation:revealUp .85s .15s var(--ease-luxury) forwards}
+    #heroScene.active.revealed .hero-copy{animation:revealUp .9s .35s var(--ease-luxury) forwards}
+    #heroScene.active.revealed .hero-name{animation:nameReveal 1.12s .58s var(--ease-luxury) forwards}
+    #heroScene.active.revealed .hero-script{animation:revealUp 1s .88s var(--ease-luxury) forwards}
+    #heroScene.active.revealed .hero-rule{animation:revealUp .9s 1.04s var(--ease-luxury) forwards}
+    #heroScene.active.revealed .hero-note{animation:revealUp .9s 1.15s var(--ease-luxury) forwards}
+    #heroScene.active.revealed .hero-action{animation:revealUp .9s 1.30s var(--ease-luxury) forwards}
+
+    /* =========================================================
+       EVENT CARD
+    ========================================================= */
+    #detailsScene{
+      background:
+        radial-gradient(circle at 18% 12%,rgba(201,164,100,.12),transparent 31%),
+        radial-gradient(circle at 90% 86%,rgba(201,164,100,.06),transparent 30%),
+        var(--black-2);
+    }
+    .details-wrap{width:min(920px,100%);margin:auto;padding-block:12px}
+    .invite-card{
+      position:relative;
+      width:min(760px,100%);
+      margin:0 auto;
+      overflow:hidden;
+      padding:clamp(45px,7vw,74px) clamp(20px,6vw,64px) clamp(40px,7vw,64px);
+      color:var(--charcoal);
+      background:
+        linear-gradient(rgba(251,247,240,.972),rgba(251,247,240,.972)),
+        repeating-linear-gradient(0deg,rgba(106,83,54,.025) 0,rgba(106,83,54,.025) 1px,transparent 1px,transparent 3px);
+      border:1px solid rgba(198,161,91,.52);
+      border-radius:3px;
+      box-shadow:
+        0 42px 86px rgba(82,55,44,.16),
+        0 14px 28px rgba(82,55,44,.08),
+        inset 0 0 0 6px rgba(198,161,91,.035),
+        inset 0 0 0 7px rgba(198,161,91,.16);
+      opacity:0;
+      transform:translateY(30px) scale(.975);
+      transform-style:preserve-3d;
+    }
+    #detailsScene.active .invite-card{animation:cardArrive 1.05s .15s var(--ease-luxury) forwards}
+    .card-border{position:absolute;inset:13px;pointer-events:none;border:1px solid rgba(198,161,91,.28)}
+    .corner{
+      position:absolute;
+      width:70px;height:70px;
+      pointer-events:none;
+      opacity:.64;
+    }
+    .corner::before,.corner::after{content:"";position:absolute;background:var(--gold);opacity:.62}
+    .corner::before{width:48px;height:1px}
+    .corner::after{width:1px;height:48px}
+    .corner.tl{top:25px;left:25px}
+    .corner.tr{top:25px;right:25px;transform:rotate(90deg)}
+    .corner.br{right:25px;bottom:25px;transform:rotate(180deg)}
+    .corner.bl{left:25px;bottom:25px;transform:rotate(270deg)}
+    .card-monogram{
+      width:54px;height:54px;
+      margin:0 auto 25px;
+      display:grid;place-items:center;
+      color:var(--burgundy);
+      border:1px solid rgba(198,161,91,.72);
+      transform:rotate(45deg);
+    }
+    .card-monogram span{
+      transform:rotate(-45deg);
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.48rem;font-weight:600;
+    }
+    .card-title{
+      margin:13px 0 3px;
+      text-align:center;
+      color:var(--burgundy);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(2.35rem,8vw,4.3rem);
+      font-weight:500;
+      line-height:.94;
+      letter-spacing:-.04em;
+    }
+    .card-script{
+      margin:11px auto 24px;
+      text-align:center;
+      color:var(--gold);
+      font-family:"Great Vibes",cursive;
+      font-size:clamp(2rem,6vw,3rem);
+    }
+    .card-message{
+      width:min(500px,100%);
+      margin:24px auto 30px;
+      text-align:center;
+      color:#685f5a;
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1.05rem,3.5vw,1.30rem);
+      line-height:1.65;
+    }
+    .event-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      border-top:1px solid rgba(198,161,91,.32);
+      border-bottom:1px solid rgba(198,161,91,.32);
+    }
+    .event-item{
+      min-width:0;
+      padding:21px 17px;
+      text-align:center;
+      border-bottom:1px solid rgba(198,161,91,.19);
+    }
+    .event-item:nth-child(odd){border-right:1px solid rgba(198,161,91,.19)}
+    .event-item:nth-last-child(-n+2){border-bottom:0}
+    .event-label{
+      display:block;
+      margin-bottom:8px;
+      color:var(--gold);
+      font-size:.64rem;
+      font-weight:600;
+      letter-spacing:.21em;
+      text-transform:uppercase;
+    }
+    .event-value{
+      display:block;
+      color:var(--charcoal);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1.02rem,3.5vw,1.25rem);
+      font-weight:600;
+      line-height:1.35;
+      overflow-wrap:anywhere;
+    }
+    .countdown-block{margin:33px 0 0;text-align:center}
+    .countdown-heading{
+      margin:0 0 15px;
+      color:var(--burgundy);
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.12rem;
+      font-style:italic;
+      font-weight:500;
+    }
+    .countdown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+    .count-unit{padding:13px 4px 11px;background:rgba(17,17,17,.035);border:1px solid rgba(198,161,91,.23)}
+    .count-unit strong{
+      display:block;
+      color:var(--burgundy);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1.5rem,5vw,2.2rem);
+      line-height:1;
+      font-weight:600;
+    }
+    .count-unit span{
+      display:block;
+      margin-top:5px;
+      color:#8c7b70;
+      font-size:clamp(.48rem,1.7vw,.60rem);
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .detail-disclosure{
+      margin-top:28px;
+      border-top:1px solid rgba(198,161,91,.28);
+      border-bottom:1px solid rgba(198,161,91,.28);
+    }
+    .detail-disclosure summary{
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      min-height:62px;
+      padding:0 3px;
+      cursor:pointer;
+      color:var(--burgundy);
+      font-size:.72rem;
+      font-weight:600;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+    .detail-disclosure summary::-webkit-details-marker{display:none}
+    .detail-disclosure summary::after{
+      content:"+";
+      width:28px;height:28px;
+      display:grid;place-items:center;
+      border:1px solid rgba(198,161,91,.55);
+      border-radius:50%;
+      color:var(--gold);
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.2rem;
+      transition:transform .3s var(--ease-luxury);
+    }
+    .detail-disclosure[open] summary::after{transform:rotate(45deg)}
+    .detail-body{padding:2px 0 24px}
+    .detail-group{
+      display:grid;
+      grid-template-columns:130px 1fr;
+      gap:18px;
+      padding:14px 3px;
+      border-top:1px solid rgba(198,161,91,.14);
+    }
+    .detail-group:first-child{border-top:0}
+    .detail-group h3{
+      margin:0;
+      color:var(--gold);
+      font-size:.67rem;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+    .detail-group p{
+      margin:0;
+      color:#655b56;
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.03rem;
+      line-height:1.6;
+    }
+    .palette{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:11px;
+    }
+    .swatch{
+      display:inline-flex;align-items:center;gap:7px;
+      padding:5px 8px;
+      border:1px solid rgba(39,35,34,.12);
+      border-radius:999px;
+      color:#6c625e;
+      font-family:"DM Sans",sans-serif;
+      font-size:.62rem;
+    }
+    .swatch i{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}
+    .payment-box{
+      margin-top:25px;
+      padding:20px;
+      background:var(--wine);
+      color:#fff;
+      border:1px solid rgba(216,187,123,.38);
+      box-shadow:12px 12px 0 rgba(198,161,91,.32);
+    }
+    .payment-head{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding-bottom:14px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+      color:var(--gold-warm);
+      font-size:.65rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+    }
+    .payment-row{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      padding:13px 0;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .payment-row:last-of-type{border-bottom:0}
+    .payment-row small{color:#978e88;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase}
+    .payment-row strong{
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.15rem;
+      font-weight:500;
+      text-align:right;
+    }
+    .payment-note{
+      margin:13px 0 0;
+      color:#aaa09a;
+      font-size:.69rem;
+      line-height:1.6;
+    }
+    .presence{
+      width:min(510px,95%);
+      margin:29px auto 0;
+      text-align:center;
+      color:var(--burgundy);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1.08rem,3.5vw,1.27rem);
+      font-style:italic;
+      line-height:1.5;
+    }
+    .card-action{margin-top:29px;text-align:center}
+
+    /* =========================================================
+       RSVP
+    ========================================================= */
+    #rsvpScene{
+      background:linear-gradient(135deg,#070707,#111111);
+    }
+    #rsvpScene::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        radial-gradient(circle at 16% 17%,rgba(216,187,123,.19),transparent 34%),
+        radial-gradient(circle at 89% 84%,rgba(201,164,100,.08),transparent 31%);
+      opacity:.42;
+    }
+    .rsvp-wrap{position:relative;z-index:3;width:min(800px,100%);margin:auto;padding-block:12px}
+    .rsvp-panel{
+      padding:clamp(31px,5vw,50px) clamp(18px,5vw,46px);
+      background:rgba(251,247,240,.99);
+      border:1px solid rgba(216,187,123,.43);
+      border-radius:23px;
+      box-shadow:0 34px 90px rgba(8,2,4,.34),inset 0 1px 0 rgba(255,255,255,.8);
+      opacity:0;
+      transform:translateY(30px) scale(.98);
+    }
+    #rsvpScene.active .rsvp-panel{animation:panelArrive .95s .10s var(--ease-luxury) forwards}
+    .rsvp-head{text-align:center;margin-bottom:29px}
+    .rsvp-title{
+      margin:10px 0;
+      color:var(--burgundy);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(2.45rem,8vw,4.1rem);
+      font-weight:500;
+      line-height:.98;
+      letter-spacing:-.035em;
+    }
+    .rsvp-desc{
+      width:min(550px,100%);
+      margin:0 auto;
+      color:var(--muted);
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.08rem;
+      line-height:1.6;
+    }
+    .rsvp-deadline{
+      display:inline-flex;
+      margin-top:16px;
+      padding:8px 11px;
+      border:1px solid rgba(198,161,91,.35);
+      border-radius:999px;
+      color:#756a65;
+      background:rgba(198,161,91,.055);
+      font-size:.67rem;
+      letter-spacing:.07em;
+    }
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+    .field{min-width:0}
+    .field.full{grid-column:1/-1}
+    .field label,.field-title{
+      display:block;
+      margin:0 0 8px;
+      color:#4d4140;
+      font-size:.72rem;
+      font-weight:600;
+      letter-spacing:.07em;
+      text-transform:uppercase;
+    }
+    .optional{color:#998d87;font-size:.66rem;font-weight:500;letter-spacing:.035em;text-transform:none}
+    .control{
+      width:100%;
+      min-height:56px;
+      padding:14px 15px;
+      color:var(--charcoal);
+      background:#fffdf9;
+      border:1px solid #d8cfc5;
+      border-radius:13px;
+      outline:none;
+      font-size:.97rem;
+      transition:border-color .24s ease,box-shadow .24s ease,background .24s ease;
+    }
+    textarea.control{min-height:108px;resize:vertical;line-height:1.5}
+    .control::placeholder{color:#aaa09b}
+    .control:hover{border-color:#c5b8ad}
+    .control:focus{background:#fff;border-color:var(--gold);box-shadow:0 0 0 4px rgba(198,161,91,.13)}
+    .field.error .control{border-color:var(--danger);box-shadow:0 0 0 3px rgba(157,48,71,.08)}
+    .error-text{min-height:17px;margin-top:5px;color:var(--danger);font-size:.69rem;line-height:1.4}
+    .radio-group{grid-column:1/-1;border:0;margin:0;padding:0}
+    .radio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .radio-option{position:relative;display:block;cursor:pointer}
+    .radio-option input{position:absolute;opacity:0;pointer-events:none}
+    .radio-card{
+      position:relative;
+      display:flex;
+      align-items:center;
+      min-height:68px;
+      padding:13px 14px 13px 47px;
+      color:#5d514e;
+      background:#fffdf9;
+      border:1px solid #d8cfc5;
+      border-radius:14px;
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.05rem;
+      font-weight:600;
+      line-height:1.25;
+      transition:transform .24s var(--ease-luxury),border-color .24s ease,background .24s ease,box-shadow .24s ease;
+    }
+    .radio-card::before{
+      content:"";
+      position:absolute;
+      left:17px;top:50%;
+      width:18px;height:18px;
+      border:1px solid #b9ada5;
+      border-radius:50%;
+      transform:translateY(-50%);
+      transition:.22s ease;
+    }
+    .radio-card::after{
+      content:"";
+      position:absolute;
+      left:22px;top:50%;
+      width:8px;height:8px;
+      background:var(--burgundy);
+      border-radius:50%;
+      transform:translateY(-50%) scale(0);
+      transition:transform .22s var(--ease-luxury);
+    }
+    .radio-option:hover .radio-card{transform:translateY(-2px);border-color:rgba(198,161,91,.8)}
+    .radio-option input:checked + .radio-card{
+      color:var(--burgundy);
+      background:rgba(198,161,91,.07);
+      border-color:var(--gold);
+      box-shadow:0 8px 22px rgba(17,17,17,.055);
+    }
+    .radio-option input:checked + .radio-card::before{border-color:var(--burgundy)}
+    .radio-option input:checked + .radio-card::after{transform:translateY(-50%) scale(1)}
+    .radio-option input:focus-visible + .radio-card{outline:2px solid var(--gold);outline-offset:3px}
+    .conditional{display:none}
+    .conditional.show{display:block}
+    .form-note{
+      grid-column:1/-1;
+      padding:14px 15px;
+      color:#746962;
+      background:rgba(198,161,91,.08);
+      border:1px solid rgba(198,161,91,.22);
+      border-radius:13px;
+      font-size:.75rem;
+      line-height:1.6;
+    }
+    .form-note strong{color:var(--burgundy)}
+    .submit-row{grid-column:1/-1;margin-top:5px;text-align:center}
+    .submit-status{
+      min-height:20px;
+      margin-top:10px;
+      color:var(--danger);
+      font-size:.74rem;
+      line-height:1.5;
+    }
+
+    /* =========================================================
+       CONFIRMATION
+    ========================================================= */
+    #confirmationScene{
+      text-align:center;
+      background:
+        radial-gradient(circle at 50% 42%,rgba(255,255,255,.96),rgba(245,240,231,.96) 44%,var(--ivory-2) 100%);
+    }
+    .confirmation{
+      position:relative;
+      width:min(720px,100%);
+      margin:auto;
+      padding:clamp(28px,7vw,62px) 10px;
+    }
+    .success-mark{
+      position:relative;
+      width:96px;height:96px;
+      margin:0 auto 29px;
+      display:grid;place-items:center;
+      color:var(--burgundy);
+      border:1px solid rgba(198,161,91,.62);
+      border-radius:50%;
+      box-shadow:0 16px 40px rgba(17,17,17,.08),inset 0 0 0 7px rgba(198,161,91,.06);
+      opacity:0;
+      transform:scale(.5) rotate(-10deg);
+    }
+    .success-mark svg{width:42px;height:42px}
+    .success-ring{position:absolute;inset:-9px;border:1px solid rgba(198,161,91,.25);border-radius:50%;opacity:0}
+    .confirm-kicker,.confirm-title,.confirm-text,.confirm-help,.confirm-signoff{opacity:0;transform:translateY(18px)}
+    .confirm-title{
+      margin:15px 0 14px;
+      color:var(--burgundy);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(2.8rem,10vw,5.7rem);
+      font-weight:500;
+      line-height:.92;
+      letter-spacing:-.04em;
+    }
+    .confirm-text{
+      width:min(550px,95%);
+      margin:0 auto;
+      color:#6e675f;
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1.18rem,4vw,1.5rem);
+      line-height:1.62;
+    }
+    .confirm-help{
+      width:min(540px,95%);
+      margin:18px auto 0;
+      color:#7e7871;
+      font-size:.79rem;
+      line-height:1.6;
+    }
+    .confirm-help strong{color:var(--burgundy)}
+    .credential-card{
+      width:min(520px,95%);
+      margin:24px auto 0;
+      padding:22px 20px;
+      background:#111111;
+      color:var(--ivory);
+      border:1px solid rgba(201,164,100,.58);
+      border-radius:18px;
+      box-shadow:0 18px 50px rgba(17,17,17,.12);
+      opacity:0;
+      transform:translateY(18px);
+    }
+    .credential-label{
+      color:var(--gold);
+      font-size:.67rem;
+      font-weight:800;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .credential-number{
+      margin-top:7px;
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(2rem,8vw,3.4rem);
+      line-height:1;
+      letter-spacing:.02em;
+    }
+    .credential-number.small{font-size:clamp(1.65rem,6vw,2.5rem)}
+    .credential-plus{
+      margin-top:20px;
+      padding-top:18px;
+      border-top:1px solid rgba(201,164,100,.22);
+    }
+    .credential-payment{
+      margin-top:18px;
+      padding-top:16px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:#c9c2b8;
+      font-size:.78rem;
+      line-height:1.55;
+    }
+    .confirm-signoff{
+      margin:28px 0 0;
+      color:var(--gold);
+      font-family:"Great Vibes",cursive;
+      font-size:clamp(2rem,7vw,3.5rem);
+    }
+    #confirmationScene.active .success-mark{animation:successPop .8s .12s var(--ease-luxury) forwards}
+    #confirmationScene.active .success-ring{animation:ringBloom 1.4s .55s var(--ease-luxury) forwards}
+    #confirmationScene.active .confirm-kicker{animation:revealUp .8s .40s var(--ease-luxury) forwards}
+    #confirmationScene.active .confirm-title{animation:revealUp .9s .58s var(--ease-luxury) forwards}
+    #confirmationScene.active .confirm-text{animation:revealUp .9s .76s var(--ease-luxury) forwards}
+    #confirmationScene.active .credential-card{animation:revealUp .9s .88s var(--ease-luxury) forwards}
+    #confirmationScene.active .confirm-help{animation:revealUp .9s 1.00s var(--ease-luxury) forwards}
+    #confirmationScene.active .confirm-signoff{animation:revealUp .9s 1.14s var(--ease-luxury) forwards}
+    .particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+    .particle{
+      position:absolute;
+      left:50%;top:50%;
+      width:4px;height:12px;
+      opacity:0;
+      background:var(--gold);
+      border-radius:99px;
+      transform:translate(-50%,-50%) rotate(var(--angle)) translateY(0);
+      animation:particleBurst 1.4s var(--delay) var(--ease-luxury) forwards;
+    }
+
+    /* =========================================================
+       MUSIC
+    ========================================================= */
+    .music{
+      position:fixed;
+      z-index:1900;
+      top:calc(var(--safe-top) + 2px);
+      right:calc(var(--safe-right) + 2px);
+      width:44px;height:44px;
+      display:none;
+      align-items:center;justify-content:center;
+      cursor:pointer;
+      color:var(--gold-warm);
+      background:rgba(45,11,18,.85);
+      border:1px solid rgba(216,187,123,.45);
+      border-radius:50%;
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      box-shadow:0 9px 24px rgba(0,0,0,.18);
+    }
+    .music.visible{display:flex}
+    .music svg{width:19px;height:19px}
+    .music .slash{opacity:0}
+    .music.muted .slash{opacity:1}
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+    @media(max-width:680px){
+      .scene{
+        align-items:flex-start;
+        padding:
+          calc(var(--safe-top) + 10px)
+          max(13px,env(safe-area-inset-right))
+          calc(var(--safe-bottom) + 17px)
+          max(13px,env(safe-area-inset-left));
+      }
+      #heroScene,#confirmationScene{align-items:center}
+      .hero-content{padding-inline:6px}
+      .floral{opacity:.28}
+      .floral.left{left:-65px}
+      .floral.right{right:-65px}
+      .invite-card{padding:47px 18px 40px;margin-top:4px}
+      .card-border{inset:9px}
+      .corner{width:45px;height:45px}
+      .corner::before{width:32px}
+      .corner::after{height:32px}
+      .corner.tl{top:19px;left:19px}
+      .corner.tr{top:19px;right:19px}
+      .corner.br{right:19px;bottom:19px}
+      .corner.bl{left:19px;bottom:19px}
+      .event-grid{grid-template-columns:1fr}
+      .event-item,.event-item:nth-child(odd),.event-item:nth-last-child(-n+2){
+        border-right:0;
+        border-bottom:1px solid rgba(198,161,91,.19);
+      }
+      .event-item:last-child{border-bottom:0}
+      .countdown-grid{gap:5px}
+      .detail-group{grid-template-columns:1fr;gap:6px}
+      .payment-box{box-shadow:8px 8px 0 rgba(198,161,91,.28)}
+      .payment-row{align-items:flex-start}
+      .rsvp-wrap{padding-top:0}
+      .rsvp-panel{border-radius:20px}
+      .form-grid{grid-template-columns:1fr;gap:14px}
+      .field.full,.radio-group,.form-note,.submit-row{grid-column:auto}
+      .radio-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:390px){
+      .curtain-intro{width:calc(100% - 22px);padding-inline:8px}
+      .open-btn{min-height:59px;padding-inline:17px;font-size:.68rem}
+      .invite-card{padding-inline:16px}
+      .event-item{padding-inline:9px}
+      .rsvp-panel{padding-inline:16px}
+      .payment-row{gap:10px}
+      .payment-row strong{font-size:1rem}
+    }
+    @media(max-width:340px){
+      .scene{padding-inline:9px}
+      .hero-name{font-size:4.35rem}
+      .hero-script{font-size:2.35rem}
+      .btn{width:100%;min-width:0;padding-inline:15px}
+      .count-unit span{letter-spacing:.04em}
+    }
+
+    /* =========================================================
+       ANIMATIONS
+    ========================================================= */
+    @keyframes revealUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes nameReveal{
+      from{opacity:0;transform:translateY(32px) scale(.94);letter-spacing:-.09em}
+      to{opacity:1;transform:translateY(0) scale(1);letter-spacing:-.06em}
+    }
+    @keyframes invitationPulse{
+      0%,100%{box-shadow:0 14px 34px rgba(0,0,0,.28),0 0 0 0 rgba(216,187,123,.08)}
+      50%{box-shadow:0 18px 40px rgba(0,0,0,.34),0 0 0 11px rgba(216,187,123,.025)}
+    }
+    @keyframes cardArrive{from{opacity:0;transform:translateY(30px) scale(.975)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes panelArrive{from{opacity:0;transform:translateY(30px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes sparkleDrift{
+      from{transform:translate3d(0,0,0) scale(.72);opacity:.08}
+      50%{opacity:.42}
+      to{transform:translate3d(8px,-22px,0) scale(1);opacity:.16}
+    }
+    @keyframes orbFloat{from{transform:translate3d(-2%,0,0) scale(.95)}to{transform:translate3d(4%,4%,0) scale(1.06)}}
+    @keyframes ripple{from{opacity:.7;transform:translate(-50%,-50%) scale(0)}to{opacity:0;transform:translate(-50%,-50%) scale(13)}}
+    @keyframes successPop{
+      0%{opacity:0;transform:scale(.48) rotate(-12deg)}
+      65%{opacity:1;transform:scale(1.08) rotate(2deg)}
+      100%{opacity:1;transform:scale(1) rotate(0)}
+    }
+    @keyframes ringBloom{0%{opacity:.6;transform:scale(.75)}100%{opacity:0;transform:scale(1.5)}}
+    @keyframes particleBurst{
+      0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--angle)) translateY(0) scale(.5)}
+      18%{opacity:.9}
+      100%{opacity:0;transform:translate(-50%,-50%) rotate(var(--angle)) translateY(var(--distance)) scale(1)}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{
+        scroll-behavior:auto!important;
+        animation-duration:.01ms!important;
+        animation-iteration-count:1!important;
+        transition-duration:.01ms!important;
+        transition-delay:0ms!important;
+      }
+      .curtain-stage.opened .curtain-panel.left{transform:translateX(-101%)}
+      .curtain-stage.opened .curtain-panel.right{transform:translateX(101%)}
+      .orb,.sparkle{animation:none!important}
+    }
+  </style>
+</head>
+<body>
+  <noscript>
+    <div style="position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:30px;background:#070707;color:#f5f0e7;text-align:center;font-family:serif">
+      Please enable JavaScript to open Nico's digital invitation.
+    </div>
+  </noscript>
+
+  <div class="app" id="app">
+    <div class="grain" aria-hidden="true"></div>
+
+    <button class="music" id="musicControl" type="button" aria-label="Toggle background music">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 18V5l10-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="16" cy="16" r="3"></circle>
+        <path class="slash" d="M4 4l16 16" stroke-width="2"></path>
+      </svg>
+    </button>
+    <audio id="backgroundMusic" loop preload="none"></audio>
+
+    <!-- ======================================================
+         STAGE 1 CLOSED CURTAINS
+    ======================================================= -->
+    <section class="curtain-stage" id="curtainStage" aria-label="Opening invitation">
+      <div class="curtain-panel left" aria-hidden="true"></div>
+      <div class="curtain-panel right" aria-hidden="true"></div>
+      <div class="curtain-top" aria-hidden="true"></div>
+      <div class="curtain-rail" aria-hidden="true"></div>
+      <div class="curtain-seam" aria-hidden="true"></div>
+
+      <div class="curtain-intro">
+        <div class="curtain-monogram" aria-hidden="true"><span>N</span></div>
+        <div class="private">Private Invitation</div>
+        <p>Something special awaits you...</p>
+
+        <button class="btn open-btn" id="openInvitation" type="button">
+          <span>Open Your Invitation</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"></path>
+            <path d="m14 7 5 5-5 5"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="curtain-vignette" aria-hidden="true"></div>
+    </section>
+
+    <!-- ======================================================
+         STAGE 2 MAIN INVITATION
+    ======================================================= -->
+    <section class="scene" id="heroScene" aria-hidden="true" aria-labelledby="heroTitle">
+      <div class="ambient" aria-hidden="true">
+        <div class="orb one"></div>
+        <div class="orb two"></div>
+        <div class="sparkles" id="heroSparkles"></div>
+      </div>
+
+      <div class="hero-shell">
+        <svg class="floral left" viewBox="0 0 250 250" aria-hidden="true">
+          <path d="M20 225C62 169 78 126 77 72C76 50 86 32 106 18"/>
+          <path class="gold" d="M76 135C55 132 40 120 29 99C49 96 65 103 78 121"/>
+          <path d="M76 95C98 86 111 69 114 45C94 50 80 63 75 83"/>
+          <path class="gold" d="M63 164C83 163 99 173 111 193C90 197 74 189 63 171"/>
+        </svg>
+
+        <svg class="floral right" viewBox="0 0 250 250" aria-hidden="true">
+          <path d="M20 225C62 169 78 126 77 72C76 50 86 32 106 18"/>
+          <path class="gold" d="M76 135C55 132 40 120 29 99C49 96 65 103 78 121"/>
+          <path d="M76 95C98 86 111 69 114 45C94 50 80 63 75 83"/>
+        </svg>
+
+        <div class="hero-content">
+          <p class="eyebrow hero-kicker">You're Cordially Invited</p>
+          <p class="hero-copy">to the birthday celebration of</p>
+          <h1 class="hero-name" id="heroTitle">NICO</h1>
+          <p class="hero-script">Let's Dine</p>
+
+          <div class="fine-rule hero-rule" aria-hidden="true"><span></span></div>
+
+          <p class="hero-note">
+            A refined birthday dinner in the heart of Nelspruit 
+            beautiful company, considered detail and an elegant evening
+            created to celebrate Nico.
+          </p>
+
+          <div class="hero-action">
+            <button class="btn large" id="nextButton" type="button">
+              <span>View Invitation</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14"></path>
+                <path d="m14 7 5 5-5 5"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         STAGE 3 EVENT INVITATION CARD
+    ======================================================= -->
+    <section class="scene" id="detailsScene" aria-hidden="true" aria-labelledby="eventTitle">
+      <div class="ambient" aria-hidden="true">
+        <div class="orb one"></div>
+        <div class="orb two"></div>
+      </div>
+
+      <div class="details-wrap">
+        <article class="invite-card" id="inviteCard">
+          <div class="card-border" aria-hidden="true"></div>
+          <div class="corner tl" aria-hidden="true"></div>
+          <div class="corner tr" aria-hidden="true"></div>
+          <div class="corner br" aria-hidden="true"></div>
+          <div class="corner bl" aria-hidden="true"></div>
+
+          <div class="card-monogram" aria-hidden="true"><span>N</span></div>
+
+          <p class="eyebrow" style="text-align:center">A Private Birthday Gala Dinner</p>
+          <h2 class="card-title" id="eventTitle">Nico's Birthday Dinner</h2>
+          <div class="card-script">Let's Dine</div>
+          <div class="fine-rule" aria-hidden="true"><span></span></div>
+
+          <p class="card-message">
+            An intimate evening of good food, beautiful memories,
+            considered details and great company awaits.
+          </p>
+
+          <div class="event-grid">
+            <div class="event-item">
+              <span class="event-label">Date</span>
+              <span class="event-value">23 October 2026</span>
+            </div>
+
+            <div class="event-item">
+              <span class="event-label">Arrival</span>
+              <span class="event-value">20:00 to 22:45</span>
+            </div>
+
+            <div class="event-item">
+              <span class="event-label">Venue</span>
+              <span class="event-value">Deja Vu Restaurant</span>
+            </div>
+
+            <div class="event-item">
+              <span class="event-label">Location</span>
+              <span class="event-value">Nelspruit, Mpumalanga</span>
+            </div>
+
+            <div class="event-item">
+              <span class="event-label">Buffet Contribution</span>
+              <span class="event-value">R380 per guest</span>
+            </div>
+
+            <div class="event-item">
+              <span class="event-label">Dress Direction</span>
+              <span class="event-value">Dress beautifully</span>
+            </div>
+
+            <div class="event-item">
+              <span class="event-label">RSVP Deadline</span>
+              <span class="event-value">31 August 2026</span>
+            </div>
+
+            <div class="event-item">
+              <span class="event-label">Payment Deadline</span>
+              <span class="event-value">30 September 2026</span>
+            </div>
+          </div>
+
+          <div class="countdown-block" aria-label="Countdown to Nico's birthday dinner">
+            <p class="countdown-heading">Until we gather at the table</p>
+            <div class="countdown-grid">
+              <div class="count-unit"><strong id="days">00</strong><span>Days</span></div>
+              <div class="count-unit"><strong id="hours">00</strong><span>Hours</span></div>
+              <div class="count-unit"><strong id="minutes">00</strong><span>Minutes</span></div>
+              <div class="count-unit"><strong id="seconds">00</strong><span>Seconds</span></div>
+            </div>
+          </div>
+
+          <details class="detail-disclosure">
+            <summary>Discover the evening</summary>
+            <div class="detail-body">
+              <div class="detail-group">
+                <h3>Courtesy of Nico</h3>
+                <p>
+                  A complimentary arrival drink, alcoholic and non alcoholic
+                  beverages including selected wines, dessert, and statement
+                  table décor are covered by Nico.
+                </p>
+              </div>
+
+              <div class="detail-group">
+                <h3>Dress Palette</h3>
+                <div>
+                  <p>Elegant, polished and celebration ready.</p>
+                  <div class="palette" aria-label="Dress colour palette">
+                    <span class="swatch"><i style="background:#6f1d2b"></i>Burgundy</span>
+                    <span class="swatch"><i style="background:#f3ead8"></i>Creamy White</span>
+                    <span class="swatch"><i style="background:#050505"></i>Black</span>
+                    <span class="swatch"><i style="background:#4a2c24"></i>Chocolate Brown</span>
+                    <span class="swatch"><i style="background:#c9a464"></i>Gold</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-group">
+                <h3>Photography</h3>
+                <p>
+                  Optional guest photography is available for R50
+                  for anyone who would like a keepsake from the evening.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <div class="payment-box">
+            <div class="payment-head">
+              <span>Buffet Payment Details</span>
+              <span>R380 per guest</span>
+            </div>
+            <div class="payment-row"><small>Bank</small><strong>ABSA</strong></div>
+            <div class="payment-row"><small>Account Number</small><strong>4106959052</strong></div>
+            <div class="payment-row"><small>PayShap</small><strong>068 660 2742</strong></div>
+            <div class="payment-row"><small>Deadline</small><strong>30 September 2026</strong></div>
+            <p class="payment-note">Please use your full name as the payment reference so your contribution can be matched to your RSVP.</p>
+          </div>
+
+          <p class="presence">Your presence would make this celebration even more special.</p>
+
+          <div class="card-action">
+            <button class="btn large" id="rsvpButton" type="button">
+              <span>Complete RSVP</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14"></path>
+                <path d="m14 7 5 5-5 5"></path>
+              </svg>
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         STAGE 4 RSVP
+    ======================================================= -->
+    <section class="scene" id="rsvpScene" aria-hidden="true" aria-labelledby="rsvpTitle">
+      <div class="sparkles" id="rsvpSparkles" aria-hidden="true"></div>
+
+      <div class="rsvp-wrap">
+        <div class="rsvp-panel">
+          <header class="rsvp-head">
+            <p class="eyebrow">Guest Response</p>
+            <h2 class="rsvp-title" id="rsvpTitle">Kindly RSVP</h2>
+            <p class="rsvp-desc">
+              Please complete your response carefully. Your RSVP will be prepared
+              as a structured WhatsApp message for the organiser.
+            </p>
+            <div class="rsvp-deadline">Invitation RSVP date: 31 August 2026</div>
+          </header>
+
+          <form id="rsvpForm" novalidate>
+            <div class="form-grid">
+              <div class="field" id="nameField">
+                <label for="fullName">Full Name *</label>
+                <input class="control" id="fullName" name="full_name" type="text" autocomplete="name" placeholder="Your full name" required>
+                <div class="error-text" id="nameError" aria-live="polite"></div>
+              </div>
+
+              <div class="field" id="phoneField">
+                <label for="phone">Phone Number *</label>
+                <input class="control" id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 081 234 5678" required>
+                <div class="error-text" id="phoneError" aria-live="polite"></div>
+              </div>
+
+              <div class="field full" id="emailField">
+                <label for="email">Email Address *</label>
+                <input class="control" id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="yourname@example.com" required>
+                <div class="error-text" id="emailError" aria-live="polite"></div>
+              </div>
+
+              <fieldset class="radio-group">
+                <legend class="field-title">Will you attend? *</legend>
+                <div class="radio-grid">
+                  <label class="radio-option">
+                    <input type="radio" name="attendance" value="attending">
+                    <span class="radio-card">Yes, I will attend</span>
+                  </label>
+                  <label class="radio-option">
+                    <input type="radio" name="attendance" value="not_attending">
+                    <span class="radio-card">No, I cannot attend</span>
+                  </label>
+                </div>
+                <div class="error-text" id="attendanceError" aria-live="polite"></div>
+              </fieldset>
+
+              <div class="field conditional attending-field" id="foodField">
+                <label for="food">Food Choice *</label>
+                <select class="control" name="food_choice" id="food">
+                  <option value="">Choose a food option</option>
+                  <option>Standard buffet</option>
+                  <option>Vegetarian</option>
+                  <option>Vegan</option>
+                  <option>Halaal friendly request</option>
+                </select>
+                <div class="error-text" id="foodError" aria-live="polite"></div>
+              </div>
+
+              <div class="field conditional attending-field" id="drinkField">
+                <label for="drink">Drink Choice *</label>
+                <select class="control" name="drink_choice" id="drink">
+                  <option value="">Choose a drink option</option>
+                  <option>Alcoholic beverages</option>
+                  <option>Non alcoholic beverages</option>
+                  <option>Both</option>
+                </select>
+                <div class="error-text" id="drinkError" aria-live="polite"></div>
+              </div>
+
+              <div class="field conditional attending-field">
+                <label for="wine">Wine Preference <span class="optional">(optional)</span></label>
+                <select class="control" name="wine_preference" id="wine">
+                  <option value="">No preference</option>
+                  <option>Red wine</option>
+                  <option>White wine</option>
+                  <option>Rosé</option>
+                  <option>Non alcoholic wine</option>
+                </select>
+                <div class="error-text"></div>
+              </div>
+
+              <div class="field conditional attending-field">
+                <label for="photography">Photography Deal · R50</label>
+                <select class="control" name="photography_option" id="photography">
+                  <option value="no">No, thank you</option>
+                  <option value="yes">Yes, add photography for R50</option>
+                </select>
+                <div class="error-text"></div>
+              </div>
+
+              <div class="field conditional attending-field">
+                <label for="dietary">Dietary Requirements <span class="optional">(optional)</span></label>
+                <input class="control" id="dietary" name="dietary_requirements" type="text" placeholder="Allergies or special requests">
+                <div class="error-text"></div>
+              </div>
+
+              <div class="field conditional attending-field">
+                <label for="plusOne">Bringing a Plus One?</label>
+                <select class="control" name="plus_one" id="plusOne">
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
+                </select>
+                <div class="error-text"></div>
+              </div>
+
+              <div class="field conditional plus-name-field" id="plusNameField">
+                <label for="plusName">Plus One Full Name *</label>
+                <input class="control" id="plusName" name="plus_one_name" type="text" placeholder="Guest's full name">
+                <div class="error-text" id="plusNameError" aria-live="polite"></div>
+              </div>
+
+              <div class="field full">
+                <label for="message">Message for Nico <span class="optional">(optional)</span></label>
+                <textarea class="control" id="message" name="message" maxlength="500" placeholder="Write a short message..."></textarea>
+              </div>
+
+              <div class="form-note">
+                <strong>Secure RSVP:</strong>
+                your response will be saved securely. If you are attending, your personal guest number and QR invitation will be emailed to you automatically.
+              </div>
+
+              <div class="submit-row">
+                <button class="btn large" id="submitRsvp" type="submit">
+                  <span>Confirm RSVP</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 2 11 13"></path>
+                    <path d="m22 2-7 20-4-9-9-4Z"></path>
+                  </svg>
+                </button>
+                <div class="submit-status" id="submitStatus" aria-live="polite"></div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         STAGE 5 RSVP CONFIRMATION
+    ======================================================= -->
+    <section class="scene" id="confirmationScene" aria-hidden="true" aria-labelledby="confirmationTitle">
+      <div class="ambient" aria-hidden="true">
+        <div class="orb one"></div>
+        <div class="orb two"></div>
+      </div>
+      <div class="particles" id="particles" aria-hidden="true"></div>
+
+      <div class="confirmation">
+        <div class="success-mark" aria-hidden="true">
+          <div class="success-ring"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m5 12.5 4.2 4.2L19 7"></path>
+          </svg>
+        </div>
+
+        <p class="eyebrow confirm-kicker">RSVP Confirmed</p>
+        <h2 class="confirm-title" id="confirmationTitle">You're on the list</h2>
+        <p class="confirm-text" id="confirmationText">
+          Your RSVP has been securely received.
+        </p>
+
+        <div class="credential-card" id="credentialCard" hidden>
+          <div class="credential-label">Your Guest Number</div>
+          <div class="credential-number" id="guestNumberDisplay">NICO-2026-0000</div>
+
+          <div class="credential-plus" id="plusOneCredential" hidden>
+            <div class="credential-label">Plus One Guest Number</div>
+            <div class="credential-number small" id="plusOneNumberDisplay"></div>
+          </div>
+
+          <div class="credential-payment" id="paymentAmountDisplay"></div>
+        </div>
+
+        <p class="confirm-help" id="confirmationHelp">
+          Check your email for your digital invitation and QR code.
+        </p>
+        <p class="confirm-signoff">With love, Nico</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // =========================================================
+    // CONFIGURATION
+    // =========================================================
+
+    const INVITATION = {
+      celebrant: "Nico",
+      title: "Let's Dine Nico's Birthday Celebration",
+      dateLabel: "23 October 2026",
+      eventDate: "2026-10-23T20:00:00+02:00",
+      arrival: "20:00 to 22:45",
+      venue: "Deja Vu Restaurant",
+      location: "Nelspruit, Mpumalanga",
+      buffetContribution: "R380 per guest",
+      rsvpDeadline: "31 August 2026",
+      paymentDeadline: "30 September 2026",
+      bank: "ABSA",
+      accountNumber: "4106959052",
+      payShap: "0686602742"
+    };
+
+    // Supabase public configuration.
+    // The publishable key is safe for browser use. Never place service-role
+    // or Resend secret keys inside this HTML file.
+    const SUPABASE_URL = "https://wezwgttczzskmgchbfaf.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iWIWWfzE-3q57OKapQPMrw_K2zzd3W9";
+    const RSVP_ENDPOINT = `${SUPABASE_URL}/functions/v1/submit-rsvp`;
+
+    // Kept only as an organiser contact number, not as the RSVP database.
+    const RSVP_WHATSAPP_NUMBER = "27686602742";
+    const RSVP_MODE = "supabase";
+
+    // Optional music.
+    const ENABLE_MUSIC = false;
+    const MUSIC_FILE = "music.mp3";
+
+    // =========================================================
+    // ELEMENTS
+    // =========================================================
+
+    const curtainStage = document.getElementById("curtainStage");
+    const openInvitationBtn = document.getElementById("openInvitation");
+
+    const heroScene = document.getElementById("heroScene");
+    const detailsScene = document.getElementById("detailsScene");
+    const rsvpScene = document.getElementById("rsvpScene");
+    const confirmationScene = document.getElementById("confirmationScene");
+
+    const nextButton = document.getElementById("nextButton");
+    const rsvpButton = document.getElementById("rsvpButton");
+    const inviteCard = document.getElementById("inviteCard");
+
+    const rsvpForm = document.getElementById("rsvpForm");
+    const attendanceInputs = [...document.querySelectorAll('input[name="attendance"]')];
+    const attendingFields = [...document.querySelectorAll(".attending-field")];
+    const plusNameField = document.querySelector(".plus-name-field");
+
+    const fullName = document.getElementById("fullName");
+    const phone = document.getElementById("phone");
+    const email = document.getElementById("email");
+    const food = document.getElementById("food");
+    const drink = document.getElementById("drink");
+    const wine = document.getElementById("wine");
+    const photography = document.getElementById("photography");
+    const dietary = document.getElementById("dietary");
+    const plusOne = document.getElementById("plusOne");
+    const plusName = document.getElementById("plusName");
+    const message = document.getElementById("message");
+    const submitStatus = document.getElementById("submitStatus");
+    const submitRsvpButton = document.getElementById("submitRsvp");
+
+    const musicControl = document.getElementById("musicControl");
+    const backgroundMusic = document.getElementById("backgroundMusic");
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const scenes = [heroScene, detailsScene, rsvpScene, confirmationScene];
+
+    // =========================================================
+    // DECORATIVE EFFECTS
+    // =========================================================
+
+    function createSparkles(container, count = 14) {
+      if (!container) return;
+
+      const fragment = document.createDocumentFragment();
+
+      for (let i = 0; i < count; i++) {
+        const sparkle = document.createElement("span");
+        sparkle.className = "sparkle";
+        sparkle.style.left = `${8 + Math.random() * 84}%`;
+        sparkle.style.top = `${7 + Math.random() * 86}%`;
+        sparkle.style.setProperty("--duration", `${6 + Math.random() * 6}s`);
+        sparkle.style.setProperty("--delay", `${Math.random() * -7}s`);
+
+        const size = 2 + Math.random() * 3;
+        sparkle.style.width = `${size}px`;
+        sparkle.style.height = `${size}px`;
+
+        fragment.appendChild(sparkle);
+      }
+
+      container.appendChild(fragment);
+    }
+
+    createSparkles(document.getElementById("heroSparkles"), 17);
+    createSparkles(document.getElementById("rsvpSparkles"), 11);
+
+    document.addEventListener("pointerdown", (event) => {
+      const button = event.target.closest(".btn");
+      if (!button || reduceMotion) return;
+
+      const rect = button.getBoundingClientRect();
+      const ripple = document.createElement("span");
+
+      ripple.className = "ripple";
+      ripple.style.left = `${event.clientX - rect.left}px`;
+      ripple.style.top = `${event.clientY - rect.top}px`;
+
+      button.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 800);
+    });
+
+    // =========================================================
+    // SCENE NAVIGATION
+    // =========================================================
+
+    function deactivateScenes() {
+      scenes.forEach((scene) => {
+        scene.classList.remove("active", "exiting");
+        scene.setAttribute("aria-hidden", "true");
+      });
+    }
+
+    function activateScene(scene, focusTarget = null) {
+      scene.classList.add("active");
+      scene.setAttribute("aria-hidden", "false");
+      scene.scrollTop = 0;
+
+      if (focusTarget) {
+        setTimeout(() => {
+          focusTarget.setAttribute("tabindex", "-1");
+          focusTarget.focus({ preventScroll: true });
+        }, reduceMotion ? 20 : 650);
+      }
+    }
+
+    function transitionScene(fromScene, toScene, focusTarget = null) {
+      fromScene.classList.add("exiting");
+
+      setTimeout(() => {
+        fromScene.classList.remove("active", "exiting");
+        fromScene.setAttribute("aria-hidden", "true");
+        activateScene(toScene, focusTarget);
+      }, reduceMotion ? 20 : 610);
+    }
+
+    deactivateScenes();
+
+    // =========================================================
+    // CURTAIN EXPERIENCE
+    // =========================================================
+
+    let invitationOpened = false;
+
+    openInvitationBtn.addEventListener("click", async () => {
+      if (invitationOpened) return;
+
+      invitationOpened = true;
+      openInvitationBtn.disabled = true;
+
+      startMusicIfEnabled();
+
+      deactivateScenes();
+      activateScene(heroScene);
+
+      requestAnimationFrame(() => {
+        heroScene.classList.add("revealed");
+      });
+
+      curtainStage.classList.add("opened");
+
+      setTimeout(() => {
+        curtainStage.classList.add("gone");
+      }, reduceMotion ? 80 : 2250);
+    });
+
+    nextButton.addEventListener("click", () => {
+      transitionScene(
+        heroScene,
+        detailsScene,
+        document.getElementById("eventTitle")
+      );
+    });
+
+    rsvpButton.addEventListener("click", () => {
+      transitionScene(
+        detailsScene,
+        rsvpScene,
+        document.getElementById("rsvpTitle")
+      );
+
+      setTimeout(() => {
+        fullName.focus({ preventScroll: true });
+      }, reduceMotion ? 40 : 880);
+    });
+
+    // =========================================================
+    // COUNTDOWN
+    // =========================================================
+
+    const eventDate = new Date(INVITATION.eventDate);
+    let countdownTimer = null;
+
+    function updateCountdown() {
+      const difference = Math.max(0, eventDate.getTime() - Date.now());
+      const days = Math.floor(difference / 86400000);
+      const hours = Math.floor((difference / 3600000) % 24);
+      const minutes = Math.floor((difference / 60000) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+
+      document.getElementById("days").textContent = String(days).padStart(2, "0");
+      document.getElementById("hours").textContent = String(hours).padStart(2, "0");
+      document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
+      document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
+
+      if (difference <= 0 && countdownTimer) {
+        clearInterval(countdownTimer);
+      }
+    }
+
+    updateCountdown();
+    countdownTimer = setInterval(updateCountdown, 1000);
+
+    // =========================================================
+    // RSVP CONDITIONAL FIELDS
+    // =========================================================
+
+    function currentAttendance() {
+      return document.querySelector('input[name="attendance"]:checked')?.value || "";
+    }
+
+    function updateAttendanceFields() {
+      const attending = currentAttendance() === "attending";
+
+      attendingFields.forEach((field) => {
+        field.classList.toggle("show", attending);
+      });
+
+      food.required = attending;
+      drink.required = attending;
+
+      if (!attending) {
+        plusOne.value = "false";
+        plusName.value = "";
+        plusName.required = false;
+        plusNameField.classList.remove("show");
+      }
+
+      clearError("attendanceError");
+    }
+
+    attendanceInputs.forEach((input) => {
+      input.addEventListener("change", updateAttendanceFields);
+    });
+
+    plusOne.addEventListener("change", () => {
+      const show = currentAttendance() === "attending" && plusOne.value === "true";
+
+      plusNameField.classList.toggle("show", show);
+      plusName.required = show;
+
+      if (!show) {
+        plusName.value = "";
+        clearError("plusNameError");
+      }
+    });
+
+    // =========================================================
+    // VALIDATION
+    // =========================================================
+
+    function fieldContainer(input) {
+      return input?.closest(".field") || null;
+    }
+
+    function showError(input, errorId, text) {
+      const field = fieldContainer(input);
+      if (field) field.classList.add("error");
+
+      const error = document.getElementById(errorId);
+      if (error) error.textContent = text;
+    }
+
+    function clearError(errorId, input = null) {
+      const error = document.getElementById(errorId);
+      if (error) error.textContent = "";
+
+      if (input) {
+        const field = fieldContainer(input);
+        if (field) field.classList.remove("error");
+      }
+    }
+
+    function resetErrors() {
+      document.querySelectorAll(".field.error").forEach((field) => field.classList.remove("error"));
+      document.querySelectorAll(".error-text").forEach((error) => error.textContent = "");
+      submitStatus.textContent = "";
+    }
+
+    function validateForm() {
+      resetErrors();
+
+      let valid = true;
+      let firstInvalid = null;
+
+      if (fullName.value.trim().length < 2) {
+        valid = false;
+        showError(fullName, "nameError", "Please enter your full name.");
+        firstInvalid ||= fullName;
+      }
+
+      if (phone.value.replace(/\D/g, "").length < 7) {
+        valid = false;
+        showError(phone, "phoneError", "Please enter a valid phone number.");
+        firstInvalid ||= phone;
+      }
+
+      if (!email.value.trim() || !email.validity.valid) {
+        valid = false;
+        showError(email, "emailError", "Please enter a valid email address.");
+        firstInvalid ||= email;
+      }
+
+      const attendance = currentAttendance();
+
+      if (!attendance) {
+        valid = false;
+        document.getElementById("attendanceError").textContent = "Please select whether you will attend.";
+        firstInvalid ||= attendanceInputs[0];
+      }
+
+      if (attendance === "attending") {
+        if (!food.value) {
+          valid = false;
+          showError(food, "foodError", "Please choose your food option.");
+          firstInvalid ||= food;
+        }
+
+        if (!drink.value) {
+          valid = false;
+          showError(drink, "drinkError", "Please choose your drink option.");
+          firstInvalid ||= drink;
+        }
+
+        if (plusOne.value === "true" && plusName.value.trim().length < 2) {
+          valid = false;
+          showError(plusName, "plusNameError", "Please enter your plus one's full name.");
+          firstInvalid ||= plusName;
+        }
+      }
+
+      if (!valid && firstInvalid) {
+        firstInvalid.focus();
+        firstInvalid.scrollIntoView({
+          behavior: reduceMotion ? "auto" : "smooth",
+          block: "center"
+        });
+      }
+
+      return valid;
+    }
+
+    [
+      [fullName, "nameError"],
+      [phone, "phoneError"],
+      [email, "emailError"],
+      [food, "foodError"],
+      [drink, "drinkError"],
+      [plusName, "plusNameError"]
+    ].forEach(([input, errorId]) => {
+      input.addEventListener("input", () => clearError(errorId, input));
+      input.addEventListener("change", () => clearError(errorId, input));
+    });
+
+    // =========================================================
+    // RSVP PAYLOAD READY FOR FUTURE DATABASE MANAGEMENT
+    // =========================================================
+
+    function makeRsvpId() {
+      if (window.crypto?.randomUUID) {
+        return crypto.randomUUID().replace(/-/g, "");
+      }
+
+      return `rsvp${Date.now()}${Math.random().toString(16).slice(2)}`;
+    }
+
+    function buildRsvpPayload() {
+      const attending = currentAttendance() === "attending";
+
+      return {
+        id: makeRsvpId(),
+        submitted_at: new Date().toISOString(),
+        event_key: "nico-birthday-2026",
+        event_name: INVITATION.title,
+        event_date: INVITATION.eventDate,
+
+        full_name: fullName.value.trim(),
+        phone: phone.value.trim(),
+        email: email.value.trim().toLowerCase(),
+        attendance: attending ? "attending" : "not_attending",
+
+        food_choice: attending ? food.value : null,
+        drink_choice: attending ? drink.value : null,
+        wine_preference: attending ? (wine.value || null) : null,
+        photography_option: attending ? photography.value === "yes" : false,
+        dietary_requirements: attending ? (dietary.value.trim() || null) : null,
+
+        plus_one: attending ? plusOne.value === "true" : false,
+        plus_one_name:
+          attending && plusOne.value === "true"
+            ? (plusName.value.trim() || null)
+            : null,
+
+        message: message.value.trim() || null,
+
+        source: "invitation.majorglory.site",
+        delivery_method: RSVP_MODE
+      };
+    }
+
+    // =========================================================
+    // SUPABASE RSVP BACKEND
+    // =========================================================
+
+    async function saveRsvpToBackend(payload) {
+      const response = await fetch(RSVP_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_PUBLISHABLE_KEY
+        },
+        body: JSON.stringify({
+          full_name: payload.full_name,
+          email: payload.email,
+          phone: payload.phone,
+          attendance: payload.attendance,
+          food_choice: payload.food_choice,
+          drink_choice: payload.drink_choice,
+          wine_preference: payload.wine_preference,
+          dietary_requirements: payload.dietary_requirements,
+          photography_option: payload.photography_option,
+          plus_one: payload.plus_one,
+          plus_one_name: payload.plus_one_name,
+          message: payload.message
+        })
+      });
+
+      let result = {};
+
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error("The RSVP service returned an unreadable response.");
+      }
+
+      if (!response.ok || result.success !== true) {
+        if (result.error === "ALREADY_RSVPED") {
+          throw new Error("This email address has already submitted an RSVP.");
+        }
+
+        if (result.error === "VALIDATION_ERROR") {
+          throw new Error("Please review your RSVP details and try again.");
+        }
+
+        throw new Error(result.message || "Your RSVP could not be submitted. Please try again.");
+      }
+
+      return result;
+    }
+
+    // =========================================================
+    // RSVP SUBMISSION
+    // =========================================================
+
+    rsvpForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!validateForm()) return;
+
+      const payload = buildRsvpPayload();
+      const buttonLabel = submitRsvpButton.querySelector("span");
+      const originalLabel = buttonLabel.textContent;
+
+      submitStatus.textContent = "";
+      submitRsvpButton.disabled = true;
+      submitRsvpButton.setAttribute("aria-busy", "true");
+      buttonLabel.textContent = "Submitting RSVP...";
+
+      try {
+        const result = await saveRsvpToBackend(payload);
+
+        configureConfirmation(payload, result);
+        createCelebrationParticles(payload.attendance === "attending" ? 22 : 10);
+
+        transitionScene(
+          rsvpScene,
+          confirmationScene,
+          document.getElementById("confirmationTitle")
+        );
+      } catch (error) {
+        console.error(error);
+        submitStatus.textContent = error instanceof Error
+          ? error.message
+          : "Your RSVP could not be submitted. Please try again.";
+      } finally {
+        submitRsvpButton.disabled = false;
+        submitRsvpButton.removeAttribute("aria-busy");
+        buttonLabel.textContent = originalLabel;
+      }
+    });
+
+    function configureConfirmation(payload, result) {
+      const attending = payload.attendance === "attending";
+      const title = document.getElementById("confirmationTitle");
+      const text = document.getElementById("confirmationText");
+      const help = document.getElementById("confirmationHelp");
+      const credentialCard = document.getElementById("credentialCard");
+      const guestNumberDisplay = document.getElementById("guestNumberDisplay");
+      const plusOneCredential = document.getElementById("plusOneCredential");
+      const plusOneNumberDisplay = document.getElementById("plusOneNumberDisplay");
+      const paymentAmountDisplay = document.getElementById("paymentAmountDisplay");
+
+      title.textContent = attending ? "You're on the list" : "Thank You";
+
+      text.textContent = attending
+        ? "Your RSVP has been securely received for Nico's birthday celebration."
+        : "Thank you for letting Nico know. Your response has been securely received.";
+
+      if (result.guest_number) {
+        credentialCard.hidden = false;
+        guestNumberDisplay.textContent = result.guest_number;
+      } else {
+        credentialCard.hidden = true;
+      }
+
+      if (attending && result.plus_one && result.plus_one_guest_number) {
+        plusOneCredential.hidden = false;
+        plusOneNumberDisplay.textContent = result.plus_one_guest_number;
+      } else {
+        plusOneCredential.hidden = true;
+      }
+
+      if (attending) {
+        const amount = Number(result.payment_amount || 0);
+        paymentAmountDisplay.textContent = `Buffet contribution recorded: R${amount.toFixed(2)}`;
+      } else {
+        paymentAmountDisplay.textContent = "Response reference saved successfully.";
+      }
+
+      const guestEmailSent = result.guest_email_status === "sent";
+      const hostEmailSent = result.host_email_status === "sent";
+
+      if (guestEmailSent && hostEmailSent) {
+        help.innerHTML = attending
+          ? `Your digital invitation and QR code have been emailed to <strong>${escapeHtmlForConfirmation(payload.email)}</strong>. Nico has also been notified.`
+          : `A confirmation has been emailed to <strong>${escapeHtmlForConfirmation(payload.email)}</strong>, and Nico has been notified.`;
+      } else if (guestEmailSent) {
+        help.innerHTML = `Your RSVP is safely stored and your confirmation email was sent. Nico's notification email is still being processed.`;
+      } else {
+        help.innerHTML = `Your RSVP is <strong>safely stored</strong>, but the confirmation email could not be sent right now. Keep your guest number and contact Nico if you need assistance.`;
+      }
+    }
+
+    function escapeHtmlForConfirmation(value) {
+      const span = document.createElement("span");
+      span.textContent = String(value || "");
+      return span.innerHTML;
+    }
+
+    function createCelebrationParticles(count = 20) {
+      const container = document.getElementById("particles");
+      container.innerHTML = "";
+
+      if (reduceMotion) return;
+
+      const fragment = document.createDocumentFragment();
+
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement("span");
+        particle.className = "particle";
+        particle.style.setProperty("--angle", `${(360 / count) * i + (Math.random() * 14 - 7)}deg`);
+        particle.style.setProperty("--distance", `${100 + Math.random() * 190}px`);
+        particle.style.setProperty("--delay", `${0.45 + Math.random() * 0.3}s`);
+
+        if (Math.random() > 0.5) {
+          particle.style.background = "#111111";
+        }
+
+        fragment.appendChild(particle);
+      }
+
+      container.appendChild(fragment);
+    }
+
+    // =========================================================
+    // MUSIC
+    // =========================================================
+
+    let musicStarted = false;
+
+    function configureMusic() {
+      if (!ENABLE_MUSIC) return;
+
+      backgroundMusic.src = MUSIC_FILE;
+      backgroundMusic.volume = 0.36;
+      musicControl.classList.add("visible");
+    }
+
+    async function startMusicIfEnabled() {
+      if (!ENABLE_MUSIC || musicStarted) return;
+
+      try {
+        await backgroundMusic.play();
+        musicStarted = true;
+        musicControl.classList.remove("muted");
+      } catch (error) {
+        musicControl.classList.add("muted");
+        console.warn("Background music could not start:", error);
+      }
+    }
+
+    musicControl.addEventListener("click", async () => {
+      if (!ENABLE_MUSIC) return;
+
+      if (backgroundMusic.paused) {
+        try {
+          await backgroundMusic.play();
+          musicStarted = true;
+          musicControl.classList.remove("muted");
+        } catch (error) {
+          console.warn("Music playback failed:", error);
+        }
+      } else {
+        backgroundMusic.pause();
+        musicControl.classList.add("muted");
+      }
+    });
+
+    configureMusic();
+
+    // =========================================================
+    // DESKTOP CARD PERSPECTIVE
+    // =========================================================
+
+    if (
+      window.matchMedia("(min-width:900px) and (hover:hover)").matches &&
+      !reduceMotion
+    ) {
+      inviteCard.addEventListener("pointermove", (event) => {
+        const rect = inviteCard.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        const rotateY = ((x / rect.width) - 0.5) * 2.6;
+        const rotateX = ((y / rect.height) - 0.5) * -2.2;
+
+        inviteCard.style.transform =
+          `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+      });
+
+      inviteCard.addEventListener("pointerleave", () => {
+        inviteCard.style.transform =
+          "perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)";
+      });
+    }
+  </script>
+</body>
+</html>
