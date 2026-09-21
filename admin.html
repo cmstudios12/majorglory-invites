@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#070707" />
+  <meta name="description" content="Nico Birthday RSVP Management Dashboard" />
+  <title>Nico RSVP Management</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --black:#070707;
+      --black-2:#0f0f0f;
+      --black-3:#171717;
+      --panel:#111111;
+      --panel-2:#151515;
+      --ivory:#f5f0e7;
+      --ivory-2:#e9dfcf;
+      --gold:#c9a464;
+      --gold-soft:#e3c58c;
+      --muted:#a7a098;
+      --muted-2:#77716b;
+      --line:rgba(201,164,100,.22);
+      --line-soft:rgba(255,255,255,.08);
+      --success:#7f9877;
+      --warning:#c29a4c;
+      --danger:#a85b66;
+      --info:#7288a7;
+      --shadow:0 24px 70px rgba(0,0,0,.42);
+      --radius:22px;
+      --radius-sm:14px;
+      --sidebar:272px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 15% 8%,rgba(201,164,100,.08),transparent 30%),
+        radial-gradient(circle at 92% 92%,rgba(201,164,100,.05),transparent 30%),
+        var(--black);
+      color:#fff;
+      font-family:Manrope,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .hidden{display:none!important}
+
+    .icon{
+      width:19px;height:19px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto
+    }
+    .icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Toast */
+    .toast-wrap{position:fixed;top:18px;right:18px;z-index:5000;display:grid;gap:10px;width:min(390px,calc(100vw - 36px))}
+    .toast{
+      background:#151515;border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start;animation:toastIn .24s ease both
+    }
+    .toast.success{border-color:rgba(127,152,119,.42)}
+    .toast.error{border-color:rgba(168,91,102,.52)}
+    .toast.warning{border-color:rgba(194,154,76,.48)}
+    .toast-title{font-weight:800;font-size:13px;color:#fff}
+    .toast-msg{font-size:12px;line-height:1.5;color:var(--muted);margin-top:3px}
+    @keyframes toastIn{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
+
+    /* Login */
+    .auth-shell{
+      min-height:100vh;display:grid;place-items:center;padding:30px 18px;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.5)),
+        radial-gradient(circle at 20% 20%,rgba(201,164,100,.12),transparent 34%),
+        var(--black);
+    }
+    .auth-card{
+      width:min(980px,100%);min-height:610px;display:grid;grid-template-columns:1.08fr .92fr;overflow:hidden;border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);background:#0b0b0b
+    }
+    .auth-art{
+      position:relative;padding:54px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;
+      background:
+        radial-gradient(circle at 25% 18%,rgba(227,197,140,.17),transparent 30%),
+        linear-gradient(145deg,#171717,#070707 62%)
+    }
+    .auth-art:after{
+      content:"";position:absolute;inset:auto -130px -180px auto;width:430px;height:430px;border:1px solid rgba(201,164,100,.2);border-radius:50%;box-shadow:0 0 0 38px rgba(201,164,100,.035),0 0 0 82px rgba(201,164,100,.02)
+    }
+    .auth-kicker{font-size:10px;text-transform:uppercase;letter-spacing:3px;color:var(--gold);font-weight:800}
+    .auth-title{font-family:"Cormorant Garamond",serif;font-size:68px;line-height:.92;margin:16px 0 18px;color:var(--ivory);max-width:540px}
+    .auth-copy{color:var(--muted);line-height:1.8;max-width:500px;font-size:14px}
+    .auth-event{
+      position:relative;z-index:1;border-top:1px solid var(--line);padding-top:24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px
+    }
+    .auth-event small{display:block;text-transform:uppercase;letter-spacing:1.5px;font-size:9px;color:var(--muted-2);font-weight:800;margin-bottom:7px}
+    .auth-event strong{font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--gold-soft);font-weight:600}
+
+    .auth-form{padding:54px;display:flex;flex-direction:column;justify-content:center;background:var(--ivory);color:#111}
+    .auth-form h2{font-family:"Cormorant Garamond",serif;font-size:40px;line-height:1;margin:0 0 10px}
+    .auth-form p{margin:0 0 30px;color:#6d665f;font-size:13px;line-height:1.7}
+    .field{display:grid;gap:8px;margin-bottom:16px}
+    .field label{font-size:10px;text-transform:uppercase;letter-spacing:1.3px;font-weight:800;color:#625a52}
+    .control{
+      width:100%;min-height:48px;border:1px solid #d8cdbd;background:#fff;color:#111;border-radius:12px;padding:0 14px;outline:none;transition:.2s ease
+    }
+    .control:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,164,100,.13)}
+    textarea.control{padding-top:12px;min-height:100px;resize:vertical}
+    .auth-btn{
+      margin-top:8px;min-height:50px;border:0;border-radius:12px;background:#0d0d0d;color:#fff;font-weight:800;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:10px
+    }
+    .auth-btn:hover{background:#1a1a1a}
+    .auth-note{font-size:11px;color:#81776d;margin-top:18px;line-height:1.65}
+
+    /* App */
+    .app{min-height:100vh;display:grid;grid-template-columns:var(--sidebar) minmax(0,1fr)}
+    .sidebar{
+      position:sticky;top:0;height:100vh;border-right:1px solid var(--line-soft);padding:25px 18px;background:rgba(8,8,8,.96);display:flex;flex-direction:column;z-index:40
+    }
+    .brand{display:flex;gap:13px;align-items:center;padding:8px 8px 26px}
+    .brand-mark{width:44px;height:44px;border:1px solid var(--gold);display:grid;place-items:center;border-radius:50%;font-family:"Cormorant Garamond",serif;font-size:25px;color:var(--gold-soft);box-shadow:inset 0 0 0 5px rgba(201,164,100,.05)}
+    .brand strong{display:block;font-family:"Cormorant Garamond",serif;font-size:23px;color:var(--ivory);line-height:1}
+    .brand span{font-size:9px;color:var(--muted);letter-spacing:1.7px;text-transform:uppercase}
+
+    .nav{display:grid;gap:7px}
+    .nav-btn{
+      width:100%;border:0;background:transparent;color:#aaa49d;padding:12px 13px;border-radius:12px;display:flex;gap:12px;align-items:center;font-weight:700;font-size:13px;text-align:left
+    }
+    .nav-btn:hover{background:#121212;color:#fff}
+    .nav-btn.active{background:linear-gradient(90deg,rgba(201,164,100,.15),rgba(201,164,100,.04));color:var(--gold-soft);border:1px solid rgba(201,164,100,.16)}
+    .side-spacer{flex:1}
+    .side-event{margin:18px 4px;border:1px solid var(--line);border-radius:16px;padding:16px;background:#0e0e0e}
+    .side-event small{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);font-weight:800}
+    .side-event strong{display:block;font-family:"Cormorant Garamond",serif;font-size:22px;color:var(--ivory);margin:7px 0 4px}
+    .side-event span{font-size:10px;color:var(--muted)}
+
+    .main{min-width:0;padding:0 0 60px}
+    .topbar{
+      position:sticky;top:0;z-index:35;min-height:78px;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line-soft);background:rgba(7,7,7,.88);backdrop-filter:blur(14px)
+    }
+    .top-title small{display:block;color:var(--muted);font-size:9px;letter-spacing:1.6px;text-transform:uppercase;font-weight:800;margin-bottom:5px}
+    .top-title strong{font-family:"Cormorant Garamond",serif;font-size:27px;color:var(--ivory);font-weight:600}
+    .top-actions{display:flex;align-items:center;gap:10px}
+    .top-user{text-align:right;margin-right:4px}
+    .top-user strong{display:block;font-size:12px;color:#fff}
+    .top-user span{display:block;font-size:10px;color:var(--muted)}
+
+    .icon-btn,.outline-btn,.gold-btn,.danger-btn{
+      border-radius:11px;min-height:42px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:800;font-size:11px;letter-spacing:.2px
+    }
+    .icon-btn{width:42px;padding:0;background:#121212;border:1px solid var(--line-soft);color:#ddd}
+    .outline-btn{background:#111;border:1px solid var(--line);color:var(--gold-soft)}
+    .gold-btn{border:1px solid var(--gold);background:var(--gold);color:#0b0b0b}
+    .danger-btn{border:1px solid rgba(168,91,102,.45);background:rgba(168,91,102,.09);color:#d6a0a8}
+    .icon-btn:hover,.outline-btn:hover{background:#181818}
+    .gold-btn:hover{filter:brightness(1.07)}
+
+    .content{padding:28px}
+    .view{display:none}.view.active{display:block}
+
+    .hero-row{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px}
+    .page-kicker{font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:800;color:var(--gold);margin-bottom:7px}
+    .page-title{font-family:"Cormorant Garamond",serif;font-size:44px;line-height:1;margin:0;color:var(--ivory);font-weight:600}
+    .page-sub{color:var(--muted);font-size:12px;line-height:1.7;margin:10px 0 0;max-width:700px}
+
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+    .stat-card{border:1px solid var(--line-soft);border-radius:18px;padding:19px;background:linear-gradient(145deg,#111,#0c0c0c);min-width:0}
+    .stat-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .stat-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(201,164,100,.08);color:var(--gold-soft);border:1px solid rgba(201,164,100,.14)}
+    .stat-label{font-size:9px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);font-weight:800;margin-top:16px}
+    .stat-value{font-family:"Cormorant Garamond",serif;font-size:38px;line-height:1;color:var(--ivory);margin-top:6px}
+    .stat-meta{font-size:10px;color:var(--muted-2);margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .panel{border:1px solid var(--line-soft);background:#0d0d0d;border-radius:20px;overflow:hidden}
+    .panel-head{padding:18px 20px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;gap:15px}
+    .panel-head h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:600;color:var(--ivory)}
+    .panel-head p{margin:4px 0 0;font-size:10px;color:var(--muted)}
+    .panel-body{padding:20px}
+
+    .toolbar{display:grid;grid-template-columns:minmax(250px,1fr) 170px 170px auto;gap:10px;padding:16px;border-bottom:1px solid var(--line-soft);background:#0a0a0a}
+    .search-wrap{position:relative}
+    .search-wrap .icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#777;width:17px;height:17px}
+    .search-wrap input{padding-left:40px}
+    .dark-control{
+      width:100%;height:43px;border-radius:11px;border:1px solid var(--line-soft);background:#131313;color:#eee;padding:0 12px;outline:none;font-size:12px
+    }
+    .dark-control:focus{border-color:rgba(201,164,100,.45)}
+    select.dark-control{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#888 50%),linear-gradient(135deg,#888 50%,transparent 50%);background-position:calc(100% - 16px) 18px,calc(100% - 11px) 18px;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px}
+
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:1100px}
+    th{padding:13px 15px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#7f7a74;font-weight:800;background:#0a0a0a;border-bottom:1px solid var(--line-soft);position:sticky;top:0;z-index:1}
+    td{padding:14px 15px;border-bottom:1px solid rgba(255,255,255,.055);font-size:11px;color:#c9c5bf;vertical-align:middle}
+    tbody tr:hover{background:#111}
+    tbody tr:last-child td{border-bottom:0}
+    .guest-cell{display:flex;align-items:center;gap:11px;min-width:220px}
+    .avatar{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;background:rgba(201,164,100,.1);border:1px solid rgba(201,164,100,.18);color:var(--gold-soft);font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:700}
+    .guest-cell strong{display:block;color:#fff;font-size:11px;margin-bottom:3px}.guest-cell span{display:block;color:#777;font-size:9px}
+    .guest-number{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--gold-soft);font-size:10px}
+    .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;font-size:9px;font-weight:800;white-space:nowrap;border:1px solid transparent}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+    .pill.success{color:#9ab691;background:rgba(127,152,119,.1);border-color:rgba(127,152,119,.22)}
+    .pill.danger{color:#d2949d;background:rgba(168,91,102,.1);border-color:rgba(168,91,102,.22)}
+    .pill.warning{color:#d6b168;background:rgba(194,154,76,.1);border-color:rgba(194,154,76,.24)}
+    .pill.muted{color:#aaa39c;background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+    .pill.info{color:#9caec6;background:rgba(114,136,167,.1);border-color:rgba(114,136,167,.23)}
+    .mini-actions{display:flex;gap:6px}.mini-btn{height:32px;padding:0 9px;border-radius:9px;background:#121212;border:1px solid var(--line-soft);color:#bbb;font-size:9px;font-weight:800}.mini-btn:hover{color:var(--gold-soft);border-color:var(--line)}
+    .empty{padding:50px 20px;text-align:center;color:var(--muted)}
+    .empty .empty-icon{width:48px;height:48px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:var(--gold)}
+    .empty strong{display:block;color:#ddd;font-family:"Cormorant Garamond",serif;font-size:24px;margin-bottom:5px}
+    .empty span{font-size:11px}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .metric-list{display:grid;gap:10px}
+    .metric-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-soft);font-size:11px}.metric-row:last-child{border-bottom:0}.metric-row span:first-child{color:var(--muted)}.metric-row strong{color:#fff}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.74);backdrop-filter:blur(8px);z-index:2000;display:grid;place-items:center;padding:18px;opacity:0;pointer-events:none;transition:.2s ease}
+    .modal-backdrop.open{opacity:1;pointer-events:auto}
+    .modal{width:min(720px,100%);max-height:min(86vh,900px);overflow:auto;border-radius:23px;border:1px solid var(--line);background:#0d0d0d;box-shadow:var(--shadow);transform:translateY(10px) scale(.99);transition:.2s ease}
+    .modal-backdrop.open .modal{transform:none}
+    .modal.sm{width:min(520px,100%)}
+    .modal.lg{width:min(920px,100%)}
+    .modal-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:18px 20px;border-bottom:1px solid var(--line-soft);background:rgba(13,13,13,.96);backdrop-filter:blur(10px)}
+    .modal-head h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:28px;color:var(--ivory);font-weight:600}.modal-head p{margin:3px 0 0;color:var(--muted);font-size:10px}
+    .modal-body{padding:22px}
+    .detail-banner{padding:22px;border-radius:17px;border:1px solid var(--line);background:linear-gradient(145deg,#161616,#0c0c0c);display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}
+    .detail-banner h4{margin:0;font-family:"Cormorant Garamond",serif;font-size:31px;color:var(--ivory);font-weight:600}.detail-banner p{margin:6px 0 0;color:var(--gold-soft);font-family:ui-monospace,monospace;font-size:11px}
+    .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .detail-item{padding:13px;border:1px solid var(--line-soft);border-radius:12px;background:#111}.detail-item small{display:block;color:#77716b;font-size:8px;letter-spacing:1.1px;text-transform:uppercase;font-weight:800;margin-bottom:6px}.detail-item strong{font-size:11px;color:#eee;line-height:1.5;word-break:break-word}
+    .detail-item.full{grid-column:1/-1}
+    .section-label{margin:22px 0 10px;font-size:9px;text-transform:uppercase;letter-spacing:1.7px;color:var(--gold);font-weight:800}
+
+    /* Scanner */
+    .scanner-box{position:relative;aspect-ratio:4/3;max-height:430px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#050505;display:grid;place-items:center}
+    .scanner-box video{width:100%;height:100%;object-fit:cover}
+    .scanner-frame{position:absolute;width:min(62%,280px);aspect-ratio:1;border:2px solid var(--gold-soft);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.34);pointer-events:none}
+    .scanner-line{position:absolute;left:10%;right:10%;height:1px;background:var(--gold-soft);box-shadow:0 0 10px var(--gold);animation:scanLine 2.2s ease-in-out infinite}
+    @keyframes scanLine{0%,100%{top:14%}50%{top:86%}}
+    .scanner-note{text-align:center;color:var(--muted);font-size:10px;line-height:1.7;margin-top:12px}
+    .scan-result{margin-top:14px;padding:16px;border-radius:13px;border:1px solid var(--line-soft);background:#111;display:none}.scan-result.show{display:block}.scan-result.success{border-color:rgba(127,152,119,.34)}.scan-result.error{border-color:rgba(168,91,102,.4)}
+    .scan-result h4{margin:0 0 5px;font-family:"Cormorant Garamond",serif;font-size:25px}.scan-result p{margin:0;color:var(--muted);font-size:11px;line-height:1.65}
+
+    .loading-overlay{position:fixed;inset:0;z-index:6000;background:rgba(7,7,7,.82);backdrop-filter:blur(8px);display:grid;place-items:center}
+    .loader-card{padding:25px 30px;border:1px solid var(--line);border-radius:17px;background:#111;text-align:center;box-shadow:var(--shadow)}
+    .spinner{width:30px;height:30px;border-radius:50%;border:2px solid rgba(201,164,100,.2);border-top-color:var(--gold);animation:spin .8s linear infinite;margin:0 auto 12px}
+    @keyframes spin{to{transform:rotate(360deg)}}.loader-card span{color:var(--muted);font-size:10px}
+
+    .mobile-menu{display:none}
+    @media (max-width:1180px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:minmax(220px,1fr) 160px 160px}.toolbar .export-slot{grid-column:1/-1;justify-self:end}}
+    @media (max-width:900px){
+      .auth-card{grid-template-columns:1fr}.auth-art{min-height:370px;padding:36px}.auth-title{font-size:54px}.auth-form{padding:38px}.app{grid-template-columns:1fr}.sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;transform:translateX(-102%);transition:.22s ease;box-shadow:30px 0 70px rgba(0,0,0,.4)}.sidebar.open{transform:none}.mobile-menu{display:inline-flex}.topbar{padding:13px 16px}.content{padding:20px 15px}.top-user{display:none}.hero-row{align-items:flex-start;flex-direction:column}.page-title{font-size:38px}.grid-2{grid-template-columns:1fr}
+    }
+    @media (max-width:650px){
+      .auth-shell{padding:0}.auth-card{min-height:100vh;border-radius:0;border:0}.auth-art{min-height:330px;padding:30px 24px}.auth-title{font-size:48px}.auth-form{padding:34px 24px}.auth-event{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr;gap:10px}.stat-card{padding:15px}.stat-value{font-size:31px}.toolbar{grid-template-columns:1fr}.toolbar .export-slot{grid-column:auto;justify-self:stretch}.toolbar .export-slot button{width:100%}.detail-grid{grid-template-columns:1fr}.detail-item.full{grid-column:auto}.detail-banner{flex-direction:column}.modal-body{padding:16px}.modal-head{padding:16px}.top-title strong{font-size:23px}.top-actions .outline-btn span.label{display:none}
+    }
+    @media (prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <div id="toastWrap" class="toast-wrap" aria-live="polite"></div>
+
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="loader-card"><div class="spinner"></div><span id="loadingText">Loading...</span></div>
+  </div>
+
+  <section id="authShell" class="auth-shell">
+    <div class="auth-card">
+      <div class="auth-art">
+        <div>
+          <div class="auth-kicker">Private event administration</div>
+          <h1 class="auth-title">Nico RSVP<br>Management</h1>
+          <p class="auth-copy">Securely manage guest responses, payments, email delivery, QR admission and live check-in for Nico's Birthday Celebration.</p>
+        </div>
+        <div class="auth-event">
+          <div><small>Event</small><strong>Let's Dine</strong></div>
+          <div><small>Date</small><strong>23 October 2026</strong></div>
+          <div><small>Venue</small><strong>Deja Vu Restaurant</strong></div>
+          <div><small>Location</small><strong>Nelspruit</strong></div>
+        </div>
+      </div>
+
+      <form id="loginForm" class="auth-form" autocomplete="on">
+        <h2>Administrator Sign In</h2>
+        <p>Use the event administrator account created in Supabase Authentication.</p>
+
+        <div class="field">
+          <label for="loginEmail">Email address</label>
+          <input class="control" id="loginEmail" type="email" autocomplete="email" value="dipuoseete@icloud.com" required>
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input class="control" id="loginPassword" type="password" autocomplete="current-password" required>
+        </div>
+
+        <button id="loginBtn" class="auth-btn" type="submit">
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg></span>
+          Sign in securely
+        </button>
+        <div id="loginError" class="auth-note hidden" style="color:#8f3f4b"></div>
+        <div class="auth-note">Access is restricted by Supabase Row Level Security. Public visitors cannot read RSVP records from this dashboard.</div>
+      </form>
+    </div>
+  </section>
+
+  <div id="appShell" class="app hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div><strong>Nico</strong><span>RSVP Management</span></div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-btn active" data-view="overview">
+          <span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+          Overview
+        </button>
+        <button class="nav-btn" data-view="guests">
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          Guest List
+        </button>
+        <button class="nav-btn" data-view="payments">
+          <span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h2"/></svg></span>
+          Payments
+        </button>
+        <button class="nav-btn" data-view="checkin">
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h4"/><path d="M15 3h4a2 2 0 0 1 2 2v4"/><path d="M21 15v4a2 2 0 0 1-2 2h-4"/><path d="M9 21H5a2 2 0 0 1-2-2v-4"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></span>
+          QR Check In
+        </button>
+      </nav>
+
+      <div class="side-spacer"></div>
+      <div class="side-event"><small>Nico's birthday</small><strong>Let's Dine</strong><span>23 October 2026 · Deja Vu Restaurant</span></div>
+      <button id="signoutBtn" class="nav-btn">
+        <span class="icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></span>
+        Sign out
+      </button>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button id="menuBtn" class="icon-btn mobile-menu" aria-label="Open menu">
+            <span class="icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
+          </button>
+          <div class="top-title"><small>Private administration</small><strong id="topTitle">Overview</strong></div>
+        </div>
+        <div class="top-actions">
+          <button id="refreshBtn" class="outline-btn">
+            <span class="icon"><svg viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M20 11a8 8 0 1 0 2 5.3"/></svg></span><span class="label">Refresh</span>
+          </button>
+          <div class="top-user"><strong id="adminName">Administrator</strong><span id="adminRole">Event admin</span></div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section id="view-overview" class="view active">
+          <div class="hero-row">
+            <div><div class="page-kicker">Live event overview</div><h2 class="page-title">Guest Management</h2><p class="page-sub">A live summary of RSVPs, expected attendance, payments, email delivery and event entry.</p></div>
+            <button class="gold-btn" data-open-scanner><span class="icon"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h4M15 3h4a2 2 0 0 1 2 2v4M21 15v4a2 2 0 0 1-2 2h-4M9 21H5a2 2 0 0 1-2-2v-4"/><path d="M8 12h8"/></svg></span>Scan Guest</button>
+          </div>
+
+          <div class="stats">
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon"><span class="icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span></div></div><div class="stat-label">Total responses</div><div id="statResponses" class="stat-value">0</div><div class="stat-meta">All RSVP submissions</div></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon"><span class="icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span></div></div><div class="stat-label">Expected guests</div><div id="statExpected" class="stat-value">0</div><div id="statExpectedMeta" class="stat-meta">Including plus ones</div></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon"><span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span></div></div><div class="stat-label">Payments marked paid</div><div id="statPaid" class="stat-value">0</div><div id="statPaidMeta" class="stat-meta">R0.00 confirmed</div></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon"><span class="icon"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/><path d="M3 3h18v18H3z"/></svg></span></div></div><div class="stat-label">Checked in</div><div id="statChecked" class="stat-value">0</div><div id="statCheckedMeta" class="stat-meta">0 awaiting arrival</div></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="panel"><div class="panel-head"><div><h3>Attendance</h3><p>Current RSVP distribution</p></div></div><div class="panel-body metric-list">
+              <div class="metric-row"><span>Attending RSVPs</span><strong id="metricAttending">0</strong></div>
+              <div class="metric-row"><span>Not attending</span><strong id="metricDeclined">0</strong></div>
+              <div class="metric-row"><span>Plus ones</span><strong id="metricPlusOnes">0</strong></div>
+              <div class="metric-row"><span>Photography requests</span><strong id="metricPhotography">0</strong></div>
+            </div></div>
+
+            <div class="panel"><div class="panel-head"><div><h3>Operations</h3><p>Important system statuses</p></div></div><div class="panel-body metric-list">
+              <div class="metric-row"><span>Guest emails sent</span><strong id="metricGuestEmails">0</strong></div>
+              <div class="metric-row"><span>Host notifications sent</span><strong id="metricHostEmails">0</strong></div>
+              <div class="metric-row"><span>Pending payments</span><strong id="metricPendingPayments">0</strong></div>
+              <div class="metric-row"><span>Buffet value marked paid</span><strong id="metricPaidValue">R0.00</strong></div>
+            </div></div>
+          </div>
+        </section>
+
+        <section id="view-guests" class="view">
+          <div class="hero-row"><div><div class="page-kicker">RSVP directory</div><h2 class="page-title">Guest List</h2><p class="page-sub">Search every response, open complete RSVP details, manage payment status and monitor check-in.</p></div></div>
+          <div class="panel">
+            <div class="toolbar">
+              <div class="search-wrap"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span><input id="guestSearch" class="dark-control" placeholder="Search name, email, phone or guest number"></div>
+              <select id="attendanceFilter" class="dark-control"><option value="all">All attendance</option><option value="attending">Attending</option><option value="not_attending">Not attending</option></select>
+              <select id="paymentFilter" class="dark-control"><option value="all">All payments</option><option value="pending">Pending</option><option value="paid">Paid</option><option value="waived">Waived</option><option value="refunded">Refunded</option></select>
+              <div class="export-slot"><button id="exportBtn" class="outline-btn"><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>Export CSV</button></div>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>Attendance</th><th>People</th><th>Buffet due</th><th>Payment</th><th>Check in</th><th>Email</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="guestTableBody"></tbody></table><div id="guestEmpty" class="empty hidden"><div class="empty-icon"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span></div><strong>No matching guests</strong><span>Try changing your search or filters.</span></div></div>
+          </div>
+        </section>
+
+        <section id="view-payments" class="view">
+          <div class="hero-row"><div><div class="page-kicker">Contribution tracking</div><h2 class="page-title">Payments</h2><p class="page-sub">Track buffet contributions and manually mark payments after verification.</p></div></div>
+          <div class="stats">
+            <div class="stat-card"><div class="stat-label">Pending</div><div id="payPendingCount" class="stat-value">0</div><div id="payPendingValue" class="stat-meta">R0.00 outstanding</div></div>
+            <div class="stat-card"><div class="stat-label">Paid</div><div id="payPaidCount" class="stat-value">0</div><div id="payPaidValue" class="stat-meta">R0.00 confirmed</div></div>
+            <div class="stat-card"><div class="stat-label">Waived</div><div id="payWaivedCount" class="stat-value">0</div><div class="stat-meta">No payment required</div></div>
+            <div class="stat-card"><div class="stat-label">Refunded</div><div id="payRefundedCount" class="stat-value">0</div><div class="stat-meta">Returned payments</div></div>
+          </div>
+          <div class="panel"><div class="panel-head"><div><h3>Payment Register</h3><p>Attending RSVPs with contribution status</p></div></div><div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>People</th><th>Buffet due</th><th>Photography</th><th>Status</th><th>Reference</th><th>Confirmed</th><th>Action</th></tr></thead><tbody id="paymentTableBody"></tbody></table><div id="paymentEmpty" class="empty hidden"><strong>No attending RSVPs</strong><span>Payments will appear after guests RSVP as attending.</span></div></div></div>
+        </section>
+
+        <section id="view-checkin" class="view">
+          <div class="hero-row"><div><div class="page-kicker">Event admission</div><h2 class="page-title">QR Check In</h2><p class="page-sub">Scan a guest's invitation QR at the door. Duplicate scans are detected automatically.</p></div><button class="gold-btn" data-open-scanner><span class="icon"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h4M15 3h4a2 2 0 0 1 2 2v4M21 15v4a2 2 0 0 1-2 2h-4M9 21H5a2 2 0 0 1-2-2v-4"/><path d="M8 12h8"/></svg></span>Open Scanner</button></div>
+          <div class="stats">
+            <div class="stat-card"><div class="stat-label">Expected guests</div><div id="checkExpected" class="stat-value">0</div><div class="stat-meta">Primary guests and plus ones</div></div>
+            <div class="stat-card"><div class="stat-label">Checked in</div><div id="checkInCount" class="stat-value">0</div><div class="stat-meta">Admitted successfully</div></div>
+            <div class="stat-card"><div class="stat-label">Still expected</div><div id="checkRemaining" class="stat-value">0</div><div class="stat-meta">Not yet scanned</div></div>
+            <div class="stat-card"><div class="stat-label">Admission rate</div><div id="checkRate" class="stat-value">0%</div><div class="stat-meta">Live event attendance</div></div>
+          </div>
+          <div class="panel"><div class="panel-head"><div><h3>Recently Checked In</h3><p>Latest successful arrivals</p></div></div><div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>Type</th><th>Checked in</th></tr></thead><tbody id="recentCheckinBody"></tbody></table><div id="recentEmpty" class="empty hidden"><strong>No guests checked in yet</strong><span>Successful QR scans will appear here.</span></div></div></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+    <div class="modal lg"><div class="modal-head"><div><h3 id="detailTitle">RSVP Details</h3><p>Complete guest response</p></div><button class="icon-btn" data-close="detailModal" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></button></div><div id="detailBody" class="modal-body"></div></div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div id="paymentModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+    <div class="modal sm"><div class="modal-head"><div><h3 id="paymentTitle">Update Payment</h3><p id="paymentSubtitle">Guest contribution</p></div><button class="icon-btn" data-close="paymentModal" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></button></div><form id="paymentForm" class="modal-body"><input id="paymentRsvpId" type="hidden"><div class="field"><label for="paymentStatus">Payment status</label><select id="paymentStatus" class="control"><option value="pending">Pending</option><option value="paid">Paid</option><option value="waived">Waived</option><option value="refunded">Refunded</option></select></div><div class="field"><label for="paymentReference">Payment reference</label><input id="paymentReference" class="control" maxlength="150" placeholder="Bank reference, PayShap reference or note"></div><button class="auth-btn" type="submit">Save Payment Status</button></form></div>
+  </div>
+
+  <!-- Scanner Modal -->
+  <div id="scannerModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="scannerTitle">
+    <div class="modal"><div class="modal-head"><div><h3 id="scannerTitle">Guest QR Check In</h3><p>Scan the QR from the guest's invitation email</p></div><button class="icon-btn" data-close="scannerModal" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></button></div><div class="modal-body">
+      <div id="scannerUnsupported" class="hidden" style="padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:11px;line-height:1.7;margin-bottom:14px">Automatic QR detection is not available in this browser. You can still paste the guest's QR URL or UUID below.</div>
+      <div class="scanner-box" id="scannerBox"><video id="scannerVideo" playsinline muted></video><div class="scanner-frame"><div class="scanner-line"></div></div></div>
+      <div class="scanner-note">Allow camera access and place the QR code inside the square. For best results, use the rear camera on a phone over HTTPS.</div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:16px"><input id="manualQr" class="dark-control" placeholder="Paste QR URL or UUID"><button id="manualCheckBtn" class="outline-btn">Check In</button></div>
+      <div id="scanResult" class="scan-result"></div>
+    </div></div>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const SUPABASE_URL = 'https://wezwgttczzskmgchbfaf.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_iWIWWfzE-3q57OKapQPMrw_K2zzd3W9';
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+  const state = { admin:null, user:null, rsvps:[], filtered:[], view:'overview', scannerStream:null, detector:null, scanLoop:null, scanning:false };
+
+  const el = {
+    authShell: $('#authShell'), appShell: $('#appShell'), loginForm: $('#loginForm'), loginBtn: $('#loginBtn'), loginError: $('#loginError'),
+    loading: $('#loadingOverlay'), loadingText: $('#loadingText'), toastWrap: $('#toastWrap'), sidebar: $('#sidebar'), menuBtn: $('#menuBtn'),
+    topTitle: $('#topTitle'), adminName: $('#adminName'), adminRole: $('#adminRole'), guestBody: $('#guestTableBody'), guestEmpty: $('#guestEmpty'),
+    paymentBody: $('#paymentTableBody'), paymentEmpty: $('#paymentEmpty'), recentBody: $('#recentCheckinBody'), recentEmpty: $('#recentEmpty'),
+    guestSearch: $('#guestSearch'), attendanceFilter: $('#attendanceFilter'), paymentFilter: $('#paymentFilter'), detailBody: $('#detailBody')
+  };
+
+  function showLoading(message='Loading...') { el.loadingText.textContent = message; el.loading.classList.remove('hidden'); }
+  function hideLoading() { el.loading.classList.add('hidden'); }
+  function esc(v='') { return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c])); }
+  function money(v) { return new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'}).format(Number(v||0)); }
+  function dateTime(v) { if(!v) return 'Not yet'; try { return new Intl.DateTimeFormat('en-ZA',{dateStyle:'medium',timeStyle:'short'}).format(new Date(v)); } catch { return v; } }
+  function shortDate(v) { if(!v) return '—'; try { return new Intl.DateTimeFormat('en-ZA',{dateStyle:'medium'}).format(new Date(v)); } catch { return v; } }
+  function initials(name='Guest') { return name.trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase() || 'G'; }
+  function human(v='') { return String(v||'').replaceAll('_',' ').replace(/\b\w/g,m=>m.toUpperCase()); }
+
+  function toast(title, message, type='success') {
+    const n = document.createElement('div'); n.className = `toast ${type}`;
+    n.innerHTML = `<div style="margin-top:1px;color:${type==='error'?'#d2949d':type==='warning'?'#d6b168':'#9ab691'}" class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l2.7 2.7L16.5 9"/></svg></div><div><div class="toast-title">${esc(title)}</div><div class="toast-msg">${esc(message)}</div></div>`;
+    el.toastWrap.appendChild(n); setTimeout(()=>{n.style.opacity='0'; n.style.transform='translateY(-6px)'; setTimeout(()=>n.remove(),220)}, 4200);
+  }
+
+  function pill(text, type='muted') { return `<span class="pill ${type}">${esc(text)}</span>`; }
+  function attendancePill(v) { return v==='attending' ? pill('Attending','success') : pill('Not attending','danger'); }
+  function paymentPill(v) { return v==='paid'?pill('Paid','success'):v==='pending'?pill('Pending','warning'):v==='waived'?pill('Waived','info'):v==='refunded'?pill('Refunded','danger'):pill(human(v)); }
+  function emailPill(v) { return v==='sent'?pill('Sent','success'):v==='failed'?pill('Failed','danger'):pill('Pending','warning'); }
+  function checkinPill(v) { return v==='checked_in'?pill('Checked in','success'):pill('Not checked in','muted'); }
+
+  async function init() {
+    showLoading('Checking secure session...');
+    const { data:{ session } } = await sb.auth.getSession();
+    if (session?.user) await authorize(session.user); else showLogin();
+    hideLoading();
+
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT' || !session) showLogin();
+      if (event === 'SIGNED_IN' && session?.user && !state.user) await authorize(session.user);
+    });
+  }
+
+  function showLogin() {
+    stopScanner(); state.user=null; state.admin=null; state.rsvps=[];
+    el.appShell.classList.add('hidden'); el.authShell.classList.remove('hidden');
+  }
+  function showApp() { el.authShell.classList.add('hidden'); el.appShell.classList.remove('hidden'); }
+
+  async function authorize(user) {
+    showLoading('Verifying administrator access...');
+    try {
+      const { data, error } = await sb.from('event_admins').select('user_id,email,full_name,role,is_active').eq('user_id', user.id).maybeSingle();
+      if (error) throw error;
+      if (!data || !data.is_active) {
+        await sb.auth.signOut(); showLogin();
+        $('#loginError').textContent = 'This account is not authorised for Nico RSVP administration.'; $('#loginError').classList.remove('hidden');
+        return;
+      }
+      state.user=user; state.admin=data; el.adminName.textContent=data.full_name||'Administrator'; el.adminRole.textContent=human(data.role||'manager');
+      showApp(); await loadRsvps();
+    } catch (err) {
+      console.error(err); toast('Access check failed', err.message || 'Could not verify administrator access.','error');
+    } finally { hideLoading(); }
+  }
+
+  el.loginForm.addEventListener('submit', async e => {
+    e.preventDefault(); el.loginError.classList.add('hidden'); el.loginBtn.disabled=true; el.loginBtn.textContent='Signing in...';
+    const email=$('#loginEmail').value.trim(); const password=$('#loginPassword').value;
+    const { data, error } = await sb.auth.signInWithPassword({email,password});
+    if (error) { el.loginError.textContent=error.message; el.loginError.classList.remove('hidden'); }
+    else if (data?.user) await authorize(data.user);
+    el.loginBtn.disabled=false; el.loginBtn.innerHTML='<span class="icon"><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg></span>Sign in securely';
+  });
+
+  $('#signoutBtn').addEventListener('click', async ()=>{ showLoading('Signing out...'); stopScanner(); await sb.auth.signOut(); hideLoading(); showLogin(); });
+
+  async function loadRsvps() {
+    showLoading('Loading RSVP data...');
+    try {
+      const { data, error } = await sb.from('rsvps').select('*').order('created_at',{ascending:false});
+      if (error) throw error;
+      state.rsvps = data || [];
+      updateAll();
+    } catch(err) { console.error(err); toast('Could not load RSVPs', err.message || 'Please refresh and try again.','error'); }
+    finally { hideLoading(); }
+  }
+
+  function updateAll() { renderStats(); applyFilters(); renderPayments(); renderRecentCheckins(); }
+
+  function getStats() {
+    const rows=state.rsvps;
+    const attending=rows.filter(r=>r.attendance==='attending');
+    const declined=rows.filter(r=>r.attendance==='not_attending');
+    const plus=attending.filter(r=>r.plus_one).length;
+    const expected=attending.length+plus;
+    const checkedPrimary=attending.filter(r=>r.check_in_status==='checked_in').length;
+    const checkedPlus=attending.filter(r=>r.plus_one && r.plus_one_check_in_status==='checked_in').length;
+    const checked=checkedPrimary+checkedPlus;
+    const paid=attending.filter(r=>r.payment_status==='paid');
+    return { total:rows.length, attending:attending.length, declined:declined.length, plus, expected, checked, pendingArrival:Math.max(0,expected-checked), paidCount:paid.length, paidValue:paid.reduce((s,r)=>s+Number(r.payment_amount||0),0), pendingPayments:attending.filter(r=>r.payment_status==='pending').length, photography:attending.filter(r=>r.photography_option).length, guestEmails:rows.filter(r=>r.guest_email_status==='sent').length, hostEmails:rows.filter(r=>r.host_email_status==='sent').length };
+  }
+
+  function renderStats() {
+    const s=getStats();
+    $('#statResponses').textContent=s.total; $('#statExpected').textContent=s.expected; $('#statExpectedMeta').textContent=`${s.attending} primary + ${s.plus} plus ones`;
+    $('#statPaid').textContent=s.paidCount; $('#statPaidMeta').textContent=`${money(s.paidValue)} confirmed`; $('#statChecked').textContent=s.checked; $('#statCheckedMeta').textContent=`${s.pendingArrival} awaiting arrival`;
+    $('#metricAttending').textContent=s.attending; $('#metricDeclined').textContent=s.declined; $('#metricPlusOnes').textContent=s.plus; $('#metricPhotography').textContent=s.photography;
+    $('#metricGuestEmails').textContent=`${s.guestEmails} / ${s.total}`; $('#metricHostEmails').textContent=`${s.hostEmails} / ${s.total}`; $('#metricPendingPayments').textContent=s.pendingPayments; $('#metricPaidValue').textContent=money(s.paidValue);
+    $('#checkExpected').textContent=s.expected; $('#checkInCount').textContent=s.checked; $('#checkRemaining').textContent=s.pendingArrival; $('#checkRate').textContent=s.expected ? `${Math.round((s.checked/s.expected)*100)}%` : '0%';
+  }
+
+  function applyFilters() {
+    const q=(el.guestSearch?.value||'').trim().toLowerCase(); const att=el.attendanceFilter?.value||'all'; const pay=el.paymentFilter?.value||'all';
+    state.filtered=state.rsvps.filter(r=>{
+      const hay=[r.full_name,r.email,r.phone,r.guest_number,r.plus_one_name,r.plus_one_guest_number].filter(Boolean).join(' ').toLowerCase();
+      return (!q||hay.includes(q)) && (att==='all'||r.attendance===att) && (pay==='all'||r.payment_status===pay);
+    }); renderGuestTable();
+  }
+  ['input','change'].forEach(evt=>{ el.guestSearch.addEventListener(evt,applyFilters); el.attendanceFilter.addEventListener(evt,applyFilters); el.paymentFilter.addEventListener(evt,applyFilters); });
+
+  function renderGuestTable() {
+    const rows=state.filtered; el.guestBody.innerHTML=''; el.guestEmpty.classList.toggle('hidden', rows.length>0);
+    rows.forEach(r=>{
+      const tr=document.createElement('tr'); const people=r.attendance==='attending' ? (r.plus_one?2:1) : 0;
+      tr.innerHTML=`
+        <td><div class="guest-cell"><div class="avatar">${esc(initials(r.full_name))}</div><div><strong>${esc(r.full_name)}</strong><span>${esc(r.email)}</span></div></div></td>
+        <td><span class="guest-number">${esc(r.guest_number)}</span></td>
+        <td>${attendancePill(r.attendance)}</td><td>${people}</td><td>${r.attendance==='attending'?money(r.payment_amount):'—'}</td><td>${paymentPill(r.payment_status)}</td>
+        <td>${r.attendance==='attending'?checkinPill(r.check_in_status):'—'}</td><td>${emailPill(r.guest_email_status)}</td><td>${shortDate(r.created_at)}</td>
+        <td><div class="mini-actions"><button class="mini-btn" data-detail="${r.id}">Details</button>${r.attendance==='attending'?`<button class="mini-btn" data-payment="${r.id}">Payment</button>`:''}</div></td>`;
+      el.guestBody.appendChild(tr);
+    });
+  }
+
+  function renderPayments() {
+    const attending=state.rsvps.filter(r=>r.attendance==='attending'); const groups={pending:[],paid:[],waived:[],refunded:[]}; attending.forEach(r=>(groups[r.payment_status]||groups.pending).push(r));
+    $('#payPendingCount').textContent=groups.pending.length; $('#payPendingValue').textContent=`${money(groups.pending.reduce((s,r)=>s+Number(r.payment_amount||0),0))} outstanding`;
+    $('#payPaidCount').textContent=groups.paid.length; $('#payPaidValue').textContent=`${money(groups.paid.reduce((s,r)=>s+Number(r.payment_amount||0),0))} confirmed`;
+    $('#payWaivedCount').textContent=groups.waived.length; $('#payRefundedCount').textContent=groups.refunded.length;
+    el.paymentBody.innerHTML=''; el.paymentEmpty.classList.toggle('hidden',attending.length>0);
+    attending.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td><div class="guest-cell"><div class="avatar">${esc(initials(r.full_name))}</div><div><strong>${esc(r.full_name)}</strong><span>${esc(r.email)}</span></div></div></td><td><span class="guest-number">${esc(r.guest_number)}</span></td><td>${r.plus_one?2:1}</td><td>${money(r.payment_amount)}</td><td>${r.photography_option?'R50 requested':'No'}</td><td>${paymentPill(r.payment_status)}</td><td>${esc(r.payment_reference||'—')}</td><td>${r.payment_confirmed_at?shortDate(r.payment_confirmed_at):'—'}</td><td><button class="mini-btn" data-payment="${r.id}">Update</button></td>`; el.paymentBody.appendChild(tr); });
+  }
+
+  function renderRecentCheckins() {
+    const items=[]; state.rsvps.forEach(r=>{ if(r.check_in_status==='checked_in') items.push({name:r.full_name,number:r.guest_number,type:'Primary guest',at:r.checked_in_at}); if(r.plus_one && r.plus_one_check_in_status==='checked_in') items.push({name:r.plus_one_name,number:r.plus_one_guest_number,type:'Plus one',at:r.plus_one_checked_in_at}); });
+    items.sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); const recent=items.slice(0,30); el.recentBody.innerHTML=''; el.recentEmpty.classList.toggle('hidden',recent.length>0);
+    recent.forEach(x=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td><div class="guest-cell"><div class="avatar">${esc(initials(x.name))}</div><div><strong>${esc(x.name)}</strong></div></div></td><td><span class="guest-number">${esc(x.number)}</span></td><td>${pill(x.type,x.type==='Plus one'?'info':'muted')}</td><td>${dateTime(x.at)}</td>`; el.recentBody.appendChild(tr); });
+  }
+
+  document.addEventListener('click', e=>{
+    const d=e.target.closest('[data-detail]'); if(d) openDetail(d.dataset.detail);
+    const p=e.target.closest('[data-payment]'); if(p) openPayment(p.dataset.payment);
+  });
+
+  function openDetail(id) {
+    const r=state.rsvps.find(x=>x.id===id); if(!r) return;
+    const plusBlock=r.plus_one?`<div class="section-label">Plus One</div><div class="detail-grid"><div class="detail-item"><small>Name</small><strong>${esc(r.plus_one_name)}</strong></div><div class="detail-item"><small>Guest number</small><strong class="guest-number">${esc(r.plus_one_guest_number)}</strong></div><div class="detail-item"><small>Check in</small><strong>${human(r.plus_one_check_in_status)}</strong></div><div class="detail-item"><small>Checked in at</small><strong>${dateTime(r.plus_one_checked_in_at)}</strong></div></div>`:'';
+    el.detailBody.innerHTML=`<div class="detail-banner"><div><h4>${esc(r.full_name)}</h4><p>${esc(r.guest_number)}</p></div><div>${attendancePill(r.attendance)}</div></div>
+      <div class="section-label">Contact</div><div class="detail-grid"><div class="detail-item"><small>Email</small><strong>${esc(r.email)}</strong></div><div class="detail-item"><small>Phone</small><strong>${esc(r.phone)}</strong></div><div class="detail-item"><small>Submitted</small><strong>${dateTime(r.created_at)}</strong></div><div class="detail-item"><small>Source</small><strong>${esc(r.source||'Invitation')}</strong></div></div>
+      <div class="section-label">Dining Preferences</div><div class="detail-grid"><div class="detail-item"><small>Food</small><strong>${esc(r.food_choice||'Not applicable')}</strong></div><div class="detail-item"><small>Drinks</small><strong>${esc(r.drink_choice||'Not applicable')}</strong></div><div class="detail-item"><small>Wine</small><strong>${esc(r.wine_preference||'No preference')}</strong></div><div class="detail-item"><small>Photography</small><strong>${r.photography_option?'Yes · R50':'No'}</strong></div><div class="detail-item full"><small>Dietary requirements</small><strong>${esc(r.dietary_requirements||'None specified')}</strong></div></div>
+      ${plusBlock}
+      <div class="section-label">Payment and Entry</div><div class="detail-grid"><div class="detail-item"><small>Buffet contribution</small><strong>${money(r.payment_amount)}</strong></div><div class="detail-item"><small>Payment status</small><strong>${human(r.payment_status)}</strong></div><div class="detail-item"><small>Payment reference</small><strong>${esc(r.payment_reference||'None')}</strong></div><div class="detail-item"><small>Payment confirmed</small><strong>${dateTime(r.payment_confirmed_at)}</strong></div><div class="detail-item"><small>Main guest check in</small><strong>${human(r.check_in_status)}</strong></div><div class="detail-item"><small>Main check in time</small><strong>${dateTime(r.checked_in_at)}</strong></div></div>
+      <div class="section-label">Email Delivery</div><div class="detail-grid"><div class="detail-item"><small>Guest confirmation</small><strong>${human(r.guest_email_status)}</strong></div><div class="detail-item"><small>Nico notification</small><strong>${human(r.host_email_status)}</strong></div>${r.email_error?`<div class="detail-item full"><small>Email error</small><strong>${esc(r.email_error)}</strong></div>`:''}</div>
+      ${r.message?`<div class="section-label">Message for Nico</div><div class="detail-item full"><strong>${esc(r.message)}</strong></div>`:''}
+      ${r.attendance==='attending'?`<div style="display:flex;justify-content:flex-end;margin-top:20px"><button class="gold-btn" data-payment="${r.id}">Update Payment</button></div>`:''}`;
+    openModal('detailModal');
+  }
+
+  function openPayment(id) {
+    const r=state.rsvps.find(x=>x.id===id); if(!r) return;
+    $('#paymentRsvpId').value=r.id; $('#paymentStatus').value=r.payment_status||'pending'; $('#paymentReference').value=r.payment_reference||''; $('#paymentSubtitle').textContent=`${r.full_name} · ${r.guest_number} · ${money(r.payment_amount)}`; openModal('paymentModal');
+  }
+
+  $('#paymentForm').addEventListener('submit', async e=>{
+    e.preventDefault(); const id=$('#paymentRsvpId').value; const status=$('#paymentStatus').value; const reference=$('#paymentReference').value.trim();
+    showLoading('Updating payment...');
+    const { data, error } = await sb.rpc('admin_update_payment',{p_rsvp_id:id,p_status:status,p_reference:reference||null});
+    hideLoading(); if(error){toast('Payment update failed',error.message,'error');return;} if(!data){toast('No record updated','The RSVP could not be found.','warning');return;}
+    closeModal('paymentModal'); toast('Payment updated',`Status changed to ${human(status)}.`); await loadRsvps();
+  });
+
+  function openModal(id){ $('#'+id).classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeModal(id){ $('#'+id).classList.remove('open'); document.body.style.overflow=''; if(id==='scannerModal') stopScanner(); }
+  $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
+  $$('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) closeModal(m.id); }));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') $$('.modal-backdrop.open').forEach(m=>closeModal(m.id)); });
+
+  function setView(view) {
+    state.view=view; $$('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${view}`)); $$('.nav-btn[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+    const titles={overview:'Overview',guests:'Guest List',payments:'Payments',checkin:'QR Check In'}; el.topTitle.textContent=titles[view]||'Dashboard'; el.sidebar.classList.remove('open');
+  }
+  $$('.nav-btn[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+  el.menuBtn.addEventListener('click',()=>el.sidebar.classList.toggle('open'));
+  $('#refreshBtn').addEventListener('click',loadRsvps);
+
+  $('#exportBtn').addEventListener('click',()=>{
+    const rows=state.filtered.length||(!el.guestSearch.value && el.attendanceFilter.value==='all' && el.paymentFilter.value==='all') ? state.filtered : [];
+    if(!rows.length){toast('Nothing to export','No guests match the current filters.','warning');return;}
+    const headers=['Guest Number','Full Name','Email','Phone','Attendance','Plus One','Plus One Name','Plus One Number','Food','Drinks','Wine','Dietary Requirements','Photography','Buffet Amount','Payment Status','Payment Reference','Main Check In','Plus One Check In','Guest Email','Host Email','Submitted'];
+    const values=rows.map(r=>[r.guest_number,r.full_name,r.email,r.phone,r.attendance,r.plus_one?'Yes':'No',r.plus_one_name||'',r.plus_one_guest_number||'',r.food_choice||'',r.drink_choice||'',r.wine_preference||'',r.dietary_requirements||'',r.photography_option?'Yes':'No',r.payment_amount,r.payment_status,r.payment_reference||'',r.check_in_status,r.plus_one_check_in_status||'',r.guest_email_status,r.host_email_status,r.created_at]);
+    const csv=[headers,...values].map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\r\n'); const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`nico-rsvp-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url); toast('CSV exported',`${rows.length} RSVP records were exported.`);
+  });
+
+  $$('[data-open-scanner]').forEach(b=>b.addEventListener('click',openScanner));
+  async function openScanner(){ openModal('scannerModal'); $('#scanResult').className='scan-result'; $('#scanResult').innerHTML=''; $('#manualQr').value=''; await startScanner(); }
+
+  async function startScanner(){
+    stopScanner();
+    if(!navigator.mediaDevices?.getUserMedia){ $('#scannerUnsupported').classList.remove('hidden'); return; }
+    try {
+      if('BarcodeDetector' in window){ state.detector=new BarcodeDetector({formats:['qr_code']}); $('#scannerUnsupported').classList.add('hidden'); }
+      else { state.detector=null; $('#scannerUnsupported').classList.remove('hidden'); }
+      state.scannerStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false}); const video=$('#scannerVideo'); video.srcObject=state.scannerStream; await video.play();
+      if(state.detector){ state.scanning=true; scanFrame(); }
+    } catch(err){ console.error(err); $('#scannerUnsupported').classList.remove('hidden'); $('#scannerUnsupported').textContent='Camera access could not be started. Check browser permission or paste the QR URL/UUID below.'; }
+  }
+  function stopScanner(){ state.scanning=false; if(state.scanLoop) cancelAnimationFrame(state.scanLoop); state.scanLoop=null; if(state.scannerStream){ state.scannerStream.getTracks().forEach(t=>t.stop()); state.scannerStream=null; } const v=$('#scannerVideo'); if(v) v.srcObject=null; }
+  async function scanFrame(){ if(!state.scanning||!state.detector) return; const video=$('#scannerVideo'); try { if(video.readyState>=2){ const codes=await state.detector.detect(video); if(codes.length){ const token=parseQrToken(codes[0].rawValue); if(token){ state.scanning=false; await checkIn(token); return; } } } } catch(err){} state.scanLoop=requestAnimationFrame(scanFrame); }
+  function parseQrToken(value){ const s=String(value||'').trim(); if(!s)return null; const uuid=s.match(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i); if(uuid)return uuid[0]; try { const u=new URL(s); const q=u.searchParams.get('qr'); if(q)return parseQrToken(q); } catch{} return null; }
+  $('#manualCheckBtn').addEventListener('click',async()=>{ const token=parseQrToken($('#manualQr').value); if(!token){showScanResult(false,'Invalid QR','Paste the full QR URL or a valid UUID token.');return;} await checkIn(token); });
+
+  async function checkIn(token){
+    stopScanner(); showScanResult(true,'Checking invitation','Please wait while the guest is verified.');
+    const { data, error }=await sb.rpc('admin_check_in_guest',{p_qr_token:token});
+    if(error){showScanResult(false,'Check in failed',error.message);return;}
+    if(!data?.success){ const msg=data?.error==='INVALID_QR'?'This QR code does not match a valid invitation.':data?.error==='NOT_ATTENDING'?`${data.full_name||'This guest'} RSVP'd as not attending.`:'The guest could not be checked in.'; showScanResult(false,'Admission denied',msg); return; }
+    if(data.already_checked_in){showScanResult(false,'Already checked in',`${data.full_name} (${data.guest_number}) was already checked in at ${dateTime(data.checked_in_at)}.`,'warning');}
+    else {showScanResult(true,'Guest checked in',`${data.full_name} · ${data.guest_number} · ${human(data.guest_type)}`); toast('Admission confirmed',`${data.full_name} has been checked in.`);}
+    await loadRsvps();
+  }
+  function showScanResult(ok,title,message,type=''){ const box=$('#scanResult'); box.className=`scan-result show ${ok?'success':'error'}`; box.innerHTML=`<h4 style="color:${ok?'#9ab691':type==='warning'?'#d6b168':'#d2949d'}">${esc(title)}</h4><p>${esc(message)}</p><div style="margin-top:12px"><button id="scanAnotherBtn" class="outline-btn">Scan Another Guest</button></div>`; $('#scanAnotherBtn').addEventListener('click',()=>{ box.className='scan-result'; box.innerHTML=''; $('#manualQr').value=''; startScanner(); }); }
+
+  init();
+})();
+</script>
+</body>
+</html>
