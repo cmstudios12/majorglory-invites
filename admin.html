@@ -107,6 +107,7 @@
     .auth-form p{margin:0 0 30px;color:#6d665f;font-size:13px;line-height:1.7}
     .field{display:grid;gap:8px;margin-bottom:16px}
     .field label{font-size:10px;text-transform:uppercase;letter-spacing:1.3px;font-weight:800;color:#625a52}
+    .field.full{grid-column:1/-1}
     .control{
       width:100%;min-height:48px;border:1px solid #d8cdbd;background:#fff;color:#111;border-radius:12px;padding:0 14px;outline:none;transition:.2s ease
     }
@@ -247,6 +248,14 @@
     .scan-result{margin-top:14px;padding:16px;border-radius:13px;border:1px solid var(--line-soft);background:#111;display:none}.scan-result.show{display:block}.scan-result.success{border-color:rgba(127,152,119,.34)}.scan-result.error{border-color:rgba(168,91,102,.4)}
     .scan-result h4{margin:0 0 5px;font-family:"Cormorant Garamond",serif;font-size:25px}.scan-result p{margin:0;color:var(--muted);font-size:11px;line-height:1.65}
 
+    .modal-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--line-soft)}
+    .danger-zone{margin-top:22px;padding:18px;border:1px solid rgba(168,91,102,.35);background:rgba(168,91,102,.06);border-radius:15px}
+    .danger-zone h4{margin:0 0 7px;font-family:"Cormorant Garamond",serif;font-size:25px;color:#e3b4bb}.danger-zone p{margin:0;color:#ad9da0;font-size:11px;line-height:1.7}
+    .confirm-code{display:inline-block;margin-top:8px;padding:6px 9px;border-radius:8px;border:1px solid rgba(201,164,100,.22);background:#0c0c0c;color:var(--gold-soft);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.4px}
+    .danger-submit{width:100%;min-height:48px;border-radius:12px;border:1px solid rgba(168,91,102,.52);background:#8d3f4b;color:#fff;font-weight:800}.danger-submit:hover{filter:brightness(1.08)}
+    .activity-action{font-weight:800;color:var(--gold-soft);font-size:10px}.activity-note{color:var(--muted);font-size:10px;line-height:1.6;max-width:420px}
+    .role-note{padding:11px 13px;border-radius:11px;border:1px solid var(--line-soft);background:#101010;color:var(--muted);font-size:10px;line-height:1.65}
+    .quick-actions{display:flex;flex-wrap:wrap;gap:8px}.quick-actions button{min-height:38px}
     .loading-overlay{position:fixed;inset:0;z-index:6000;background:rgba(7,7,7,.82);backdrop-filter:blur(8px);display:grid;place-items:center}
     .loader-card{padding:25px 30px;border:1px solid var(--line);border-radius:17px;background:#111;text-align:center;box-shadow:var(--shadow)}
     .spinner{width:30px;height:30px;border-radius:50%;border:2px solid rgba(201,164,100,.2);border-top-color:var(--gold);animation:spin .8s linear infinite;margin:0 auto 12px}
@@ -332,6 +341,10 @@
         <button class="nav-btn" data-view="checkin">
           <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h4"/><path d="M15 3h4a2 2 0 0 1 2 2v4"/><path d="M21 15v4a2 2 0 0 1-2 2h-4"/><path d="M9 21H5a2 2 0 0 1-2-2v-4"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></span>
           QR Check In
+        </button>
+        <button class="nav-btn" data-view="activity">
+          <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/><path d="M4.9 4.9l1.4 1.4"/></svg></span>
+          Admin Activity
         </button>
       </nav>
 
@@ -422,7 +435,15 @@
             <div class="stat-card"><div class="stat-label">Still expected</div><div id="checkRemaining" class="stat-value">0</div><div class="stat-meta">Not yet scanned</div></div>
             <div class="stat-card"><div class="stat-label">Admission rate</div><div id="checkRate" class="stat-value">0%</div><div class="stat-meta">Live event attendance</div></div>
           </div>
-          <div class="panel"><div class="panel-head"><div><h3>Recently Checked In</h3><p>Latest successful arrivals</p></div></div><div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>Type</th><th>Checked in</th></tr></thead><tbody id="recentCheckinBody"></tbody></table><div id="recentEmpty" class="empty hidden"><strong>No guests checked in yet</strong><span>Successful QR scans will appear here.</span></div></div></div>
+          <div class="panel"><div class="panel-head"><div><h3>Recently Checked In</h3><p>Latest successful arrivals</p></div></div><div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>Type</th><th>Checked in</th><th>Action</th></tr></thead><tbody id="recentCheckinBody"></tbody></table><div id="recentEmpty" class="empty hidden"><strong>No guests checked in yet</strong><span>Successful QR scans will appear here.</span></div></div></div>
+        </section>
+
+        <section id="view-activity" class="view">
+          <div class="hero-row"><div><div class="page-kicker">Security and management history</div><h2 class="page-title">Admin Activity</h2><p class="page-sub">A permanent audit trail of RSVP edits, payment changes, check-in resets and deletions performed by event administrators.</p></div><button id="refreshActivityBtn" class="outline-btn">Refresh Activity</button></div>
+          <div class="panel">
+            <div class="panel-head"><div><h3>Management Audit Log</h3><p>Newest administrative actions appear first</p></div><div class="role-note">Delete actions remain here even after the RSVP itself is permanently removed.</div></div>
+            <div class="table-wrap"><table><thead><tr><th>Time</th><th>Action</th><th>Guest</th><th>Guest number</th><th>Administrator</th><th>Details</th></tr></thead><tbody id="activityTableBody"></tbody></table><div id="activityEmpty" class="empty hidden"><strong>No management activity yet</strong><span>Edits, payments, resets and deletions will appear here.</span></div></div>
+          </div>
         </section>
       </div>
     </main>
@@ -436,6 +457,48 @@
   <!-- Payment Modal -->
   <div id="paymentModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
     <div class="modal sm"><div class="modal-head"><div><h3 id="paymentTitle">Update Payment</h3><p id="paymentSubtitle">Guest contribution</p></div><button class="icon-btn" data-close="paymentModal" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></button></div><form id="paymentForm" class="modal-body"><input id="paymentRsvpId" type="hidden"><div class="field"><label for="paymentStatus">Payment status</label><select id="paymentStatus" class="control"><option value="pending">Pending</option><option value="paid">Paid</option><option value="waived">Waived</option><option value="refunded">Refunded</option></select></div><div class="field"><label for="paymentReference">Payment reference</label><input id="paymentReference" class="control" maxlength="150" placeholder="Bank reference, PayShap reference or note"></div><button class="auth-btn" type="submit">Save Payment Status</button></form></div>
+  </div>
+
+  <!-- Edit RSVP Modal -->
+  <div id="editModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+    <div class="modal lg"><div class="modal-head"><div><h3 id="editTitle">Edit RSVP</h3><p id="editSubtitle">Update guest response</p></div><button class="icon-btn" data-close="editModal" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></button></div>
+      <form id="editForm" class="modal-body">
+        <input id="editRsvpId" type="hidden">
+        <div class="detail-grid">
+          <div class="field"><label for="editFullName">Full name</label><input id="editFullName" class="control" maxlength="120" required></div>
+          <div class="field"><label for="editEmail">Email</label><input id="editEmail" class="control" type="email" maxlength="254" required></div>
+          <div class="field"><label for="editPhone">Phone</label><input id="editPhone" class="control" maxlength="40" required></div>
+          <div class="field"><label for="editAttendance">Attendance</label><select id="editAttendance" class="control"><option value="attending">Attending</option><option value="not_attending">Not attending</option></select></div>
+        </div>
+        <div id="editAttendingFields">
+          <div class="section-label">Dining Preferences</div>
+          <div class="detail-grid">
+            <div class="field"><label for="editFood">Food choice</label><select id="editFood" class="control"><option value="Standard buffet">Standard buffet</option><option value="Vegetarian">Vegetarian</option><option value="Vegan">Vegan</option><option value="Halaal friendly request">Halaal friendly request</option></select></div>
+            <div class="field"><label for="editDrink">Drink choice</label><select id="editDrink" class="control"><option value="Alcoholic beverages">Alcoholic beverages</option><option value="Non alcoholic beverages">Non alcoholic beverages</option><option value="Both">Both</option></select></div>
+            <div class="field"><label for="editWine">Wine preference</label><select id="editWine" class="control"><option value="">No preference</option><option value="Red wine">Red wine</option><option value="White wine">White wine</option><option value="Rosé">Rosé</option><option value="Non alcoholic wine">Non alcoholic wine</option></select></div>
+            <div class="field"><label for="editPhotography">Photography R50</label><select id="editPhotography" class="control"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div class="field full"><label for="editDietary">Dietary requirements</label><textarea id="editDietary" class="control" maxlength="300" placeholder="None specified"></textarea></div>
+            <div class="field"><label for="editPlusOne">Plus one</label><select id="editPlusOne" class="control"><option value="false">No</option><option value="true">Yes</option></select></div>
+            <div id="editPlusOneNameField" class="field hidden"><label for="editPlusOneName">Plus one full name</label><input id="editPlusOneName" class="control" maxlength="120"></div>
+          </div>
+        </div>
+        <div class="field"><label for="editMessage">Message for Nico</label><textarea id="editMessage" class="control" maxlength="500"></textarea></div>
+        <div class="role-note">Changing attendance or plus-one status automatically recalculates the buffet contribution. Existing unique guest numbers are preserved whenever possible.</div>
+        <div class="modal-actions"><button type="button" class="outline-btn" data-close="editModal">Cancel</button><button class="gold-btn" type="submit">Save RSVP Changes</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete RSVP Modal -->
+  <div id="deleteModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+    <div class="modal sm"><div class="modal-head"><div><h3 id="deleteTitle">Delete RSVP</h3><p>Permanent removal</p></div><button class="icon-btn" data-close="deleteModal" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></button></div>
+      <form id="deleteForm" class="modal-body">
+        <input id="deleteRsvpId" type="hidden">
+        <div class="danger-zone"><h4 id="deleteGuestName">Delete guest</h4><p>This permanently removes the RSVP, its plus one credentials and linked email logs. The admin audit record is retained. This action cannot be undone.</p><div class="confirm-code" id="deleteGuestNumber"></div></div>
+        <div class="field" style="margin-top:18px"><label for="deleteConfirm">Type the guest number to confirm</label><input id="deleteConfirm" class="control" autocomplete="off" placeholder="NICO-2026-0001" required></div>
+        <button id="deleteSubmitBtn" class="danger-submit" type="submit">Permanently Delete RSVP</button>
+      </form>
+    </div>
   </div>
 
   <!-- Scanner Modal -->
@@ -462,14 +525,14 @@
 
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
-  const state = { admin:null, user:null, rsvps:[], filtered:[], view:'overview', scannerStream:null, detector:null, scanLoop:null, scanning:false };
+  const state = { admin:null, user:null, rsvps:[], filtered:[], audit:[], view:'overview', scannerStream:null, detector:null, scanLoop:null, scanning:false };
 
   const el = {
     authShell: $('#authShell'), appShell: $('#appShell'), loginForm: $('#loginForm'), loginBtn: $('#loginBtn'), loginError: $('#loginError'),
     loading: $('#loadingOverlay'), loadingText: $('#loadingText'), toastWrap: $('#toastWrap'), sidebar: $('#sidebar'), menuBtn: $('#menuBtn'),
     topTitle: $('#topTitle'), adminName: $('#adminName'), adminRole: $('#adminRole'), guestBody: $('#guestTableBody'), guestEmpty: $('#guestEmpty'),
     paymentBody: $('#paymentTableBody'), paymentEmpty: $('#paymentEmpty'), recentBody: $('#recentCheckinBody'), recentEmpty: $('#recentEmpty'),
-    guestSearch: $('#guestSearch'), attendanceFilter: $('#attendanceFilter'), paymentFilter: $('#paymentFilter'), detailBody: $('#detailBody')
+    guestSearch: $('#guestSearch'), attendanceFilter: $('#attendanceFilter'), paymentFilter: $('#paymentFilter'), detailBody: $('#detailBody'), activityBody: $('#activityTableBody'), activityEmpty: $('#activityEmpty')
   };
 
   function showLoading(message='Loading...') { el.loadingText.textContent = message; el.loading.classList.remove('hidden'); }
@@ -492,6 +555,7 @@
   function paymentPill(v) { return v==='paid'?pill('Paid','success'):v==='pending'?pill('Pending','warning'):v==='waived'?pill('Waived','info'):v==='refunded'?pill('Refunded','danger'):pill(human(v)); }
   function emailPill(v) { return v==='sent'?pill('Sent','success'):v==='failed'?pill('Failed','danger'):pill('Pending','warning'); }
   function checkinPill(v) { return v==='checked_in'?pill('Checked in','success'):pill('Not checked in','muted'); }
+  function canManage() { return ['owner','manager'].includes(state.admin?.role); }
 
   async function init() {
     showLoading('Checking secure session...');
@@ -506,7 +570,7 @@
   }
 
   function showLogin() {
-    stopScanner(); state.user=null; state.admin=null; state.rsvps=[];
+    stopScanner(); state.user=null; state.admin=null; state.rsvps=[]; state.audit=[];
     el.appShell.classList.add('hidden'); el.authShell.classList.remove('hidden');
   }
   function showApp() { el.authShell.classList.add('hidden'); el.appShell.classList.remove('hidden'); }
@@ -545,12 +609,14 @@
       const { data, error } = await sb.from('rsvps').select('*').order('created_at',{ascending:false});
       if (error) throw error;
       state.rsvps = data || [];
+      const { data:auditData, error:auditError } = await sb.from('event_admin_actions').select('*').order('created_at',{ascending:false}).limit(300);
+      if (auditError) { console.warn('Audit log unavailable:', auditError.message); state.audit=[]; } else state.audit=auditData||[];
       updateAll();
     } catch(err) { console.error(err); toast('Could not load RSVPs', err.message || 'Please refresh and try again.','error'); }
     finally { hideLoading(); }
   }
 
-  function updateAll() { renderStats(); applyFilters(); renderPayments(); renderRecentCheckins(); }
+  function updateAll() { renderStats(); applyFilters(); renderPayments(); renderRecentCheckins(); renderActivity(); }
 
   function getStats() {
     const rows=state.rsvps;
@@ -592,7 +658,7 @@
         <td><span class="guest-number">${esc(r.guest_number)}</span></td>
         <td>${attendancePill(r.attendance)}</td><td>${people}</td><td>${r.attendance==='attending'?money(r.payment_amount):'—'}</td><td>${paymentPill(r.payment_status)}</td>
         <td>${r.attendance==='attending'?checkinPill(r.check_in_status):'—'}</td><td>${emailPill(r.guest_email_status)}</td><td>${shortDate(r.created_at)}</td>
-        <td><div class="mini-actions"><button class="mini-btn" data-detail="${r.id}">Details</button>${r.attendance==='attending'?`<button class="mini-btn" data-payment="${r.id}">Payment</button>`:''}</div></td>`;
+        <td><div class="mini-actions"><button class="mini-btn" data-detail="${r.id}">Details</button>${canManage()?`<button class="mini-btn" data-edit="${r.id}">Edit</button>${r.attendance==='attending'?`<button class="mini-btn" data-payment="${r.id}">Payment</button>`:''}<button class="mini-btn" data-delete="${r.id}" style="color:#d2949d">Delete</button>`:''}</div></td>`;
       el.guestBody.appendChild(tr);
     });
   }
@@ -609,12 +675,32 @@
   function renderRecentCheckins() {
     const items=[]; state.rsvps.forEach(r=>{ if(r.check_in_status==='checked_in') items.push({name:r.full_name,number:r.guest_number,type:'Primary guest',at:r.checked_in_at}); if(r.plus_one && r.plus_one_check_in_status==='checked_in') items.push({name:r.plus_one_name,number:r.plus_one_guest_number,type:'Plus one',at:r.plus_one_checked_in_at}); });
     items.sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); const recent=items.slice(0,30); el.recentBody.innerHTML=''; el.recentEmpty.classList.toggle('hidden',recent.length>0);
-    recent.forEach(x=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td><div class="guest-cell"><div class="avatar">${esc(initials(x.name))}</div><div><strong>${esc(x.name)}</strong></div></div></td><td><span class="guest-number">${esc(x.number)}</span></td><td>${pill(x.type,x.type==='Plus one'?'info':'muted')}</td><td>${dateTime(x.at)}</td>`; el.recentBody.appendChild(tr); });
+    recent.forEach(x=>{ const row=state.rsvps.find(r=>r.guest_number===x.number || r.plus_one_guest_number===x.number); const type=x.type==='Plus one'?'plus_one':'primary'; const tr=document.createElement('tr'); tr.innerHTML=`<td><div class="guest-cell"><div class="avatar">${esc(initials(x.name))}</div><div><strong>${esc(x.name)}</strong></div></div></td><td><span class="guest-number">${esc(x.number)}</span></td><td>${pill(x.type,x.type==='Plus one'?'info':'muted')}</td><td>${dateTime(x.at)}</td><td>${canManage()&&row?`<button class="mini-btn" data-reset-checkin="${row.id}" data-guest-type="${type}">Undo Check In</button>`:'—'}</td>`; el.recentBody.appendChild(tr); });
+  }
+
+
+  function renderActivity() {
+    if(!el.activityBody || !el.activityEmpty) return;
+    el.activityBody.innerHTML='';
+    el.activityEmpty.classList.toggle('hidden', state.audit.length>0);
+    state.audit.forEach(a=>{
+      const detailParts=[];
+      if(a.details?.payment_status) detailParts.push(`Payment: ${human(a.details.payment_status)}`);
+      if(a.details?.guest_type) detailParts.push(`Guest type: ${human(a.details.guest_type)}`);
+      if(a.details?.attendance) detailParts.push(`Attendance: ${human(a.details.attendance)}`);
+      if(a.action==='rsvp_deleted') detailParts.push('RSVP permanently removed');
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${dateTime(a.created_at)}</td><td><span class="activity-action">${esc(human(a.action))}</span></td><td>${esc(a.guest_name||'—')}</td><td><span class="guest-number">${esc(a.guest_number||'—')}</span></td><td>${esc(a.actor_email||'Administrator')}</td><td><div class="activity-note">${esc(detailParts.join(' · ')||'Administrative change')}</div></td>`;
+      el.activityBody.appendChild(tr);
+    });
   }
 
   document.addEventListener('click', e=>{
     const d=e.target.closest('[data-detail]'); if(d) openDetail(d.dataset.detail);
     const p=e.target.closest('[data-payment]'); if(p) openPayment(p.dataset.payment);
+    const ed=e.target.closest('[data-edit]'); if(ed) openEdit(ed.dataset.edit);
+    const del=e.target.closest('[data-delete]'); if(del) openDelete(del.dataset.delete);
+    const reset=e.target.closest('[data-reset-checkin]'); if(reset) resetCheckIn(reset.dataset.resetCheckin, reset.dataset.guestType);
   });
 
   function openDetail(id) {
@@ -627,11 +713,86 @@
       <div class="section-label">Payment and Entry</div><div class="detail-grid"><div class="detail-item"><small>Buffet contribution</small><strong>${money(r.payment_amount)}</strong></div><div class="detail-item"><small>Payment status</small><strong>${human(r.payment_status)}</strong></div><div class="detail-item"><small>Payment reference</small><strong>${esc(r.payment_reference||'None')}</strong></div><div class="detail-item"><small>Payment confirmed</small><strong>${dateTime(r.payment_confirmed_at)}</strong></div><div class="detail-item"><small>Main guest check in</small><strong>${human(r.check_in_status)}</strong></div><div class="detail-item"><small>Main check in time</small><strong>${dateTime(r.checked_in_at)}</strong></div></div>
       <div class="section-label">Email Delivery</div><div class="detail-grid"><div class="detail-item"><small>Guest confirmation</small><strong>${human(r.guest_email_status)}</strong></div><div class="detail-item"><small>Nico notification</small><strong>${human(r.host_email_status)}</strong></div>${r.email_error?`<div class="detail-item full"><small>Email error</small><strong>${esc(r.email_error)}</strong></div>`:''}</div>
       ${r.message?`<div class="section-label">Message for Nico</div><div class="detail-item full"><strong>${esc(r.message)}</strong></div>`:''}
-      ${r.attendance==='attending'?`<div style="display:flex;justify-content:flex-end;margin-top:20px"><button class="gold-btn" data-payment="${r.id}">Update Payment</button></div>`:''}`;
+      ${canManage()?`<div class="modal-actions"><button class="outline-btn" data-edit="${r.id}">Edit RSVP</button>${r.attendance==='attending'?`<button class="gold-btn" data-payment="${r.id}">Update Payment</button>`:''}${r.check_in_status==='checked_in'?`<button class="outline-btn" data-reset-checkin="${r.id}" data-guest-type="primary">Undo Main Check In</button>`:''}${r.plus_one&&r.plus_one_check_in_status==='checked_in'?`<button class="outline-btn" data-reset-checkin="${r.id}" data-guest-type="plus_one">Undo Plus One Check In</button>`:''}<button class="danger-btn" data-delete="${r.id}">Delete RSVP</button></div>`:''}`;
     openModal('detailModal');
   }
 
+  function syncEditVisibility() {
+    const attending=$('#editAttendance').value==='attending';
+    $('#editAttendingFields').classList.toggle('hidden',!attending);
+    const plus=attending && $('#editPlusOne').value==='true';
+    $('#editPlusOneNameField').classList.toggle('hidden',!plus);
+    $('#editPlusOneName').required=plus;
+  }
+
+  function openEdit(id) {
+    if(!canManage()){toast('Management access required','Scanner accounts cannot edit RSVPs.','warning');return;}
+    const r=state.rsvps.find(x=>x.id===id); if(!r) return;
+    closeModal('detailModal');
+    $('#editRsvpId').value=r.id; $('#editSubtitle').textContent=`${r.full_name} · ${r.guest_number}`;
+    $('#editFullName').value=r.full_name||''; $('#editEmail').value=r.email||''; $('#editPhone').value=r.phone||''; $('#editAttendance').value=r.attendance||'attending';
+    $('#editFood').value=r.food_choice||'Standard buffet'; $('#editDrink').value=r.drink_choice||'Both'; $('#editWine').value=r.wine_preference||''; $('#editPhotography').value=String(Boolean(r.photography_option));
+    $('#editDietary').value=r.dietary_requirements||''; $('#editPlusOne').value=String(Boolean(r.plus_one)); $('#editPlusOneName').value=r.plus_one_name||''; $('#editMessage').value=r.message||'';
+    syncEditVisibility(); openModal('editModal');
+  }
+
+  $('#editAttendance').addEventListener('change',syncEditVisibility);
+  $('#editPlusOne').addEventListener('change',syncEditVisibility);
+
+  $('#editForm').addEventListener('submit', async e=>{
+    e.preventDefault(); if(!canManage()) return;
+    const payload={
+      p_rsvp_id:$('#editRsvpId').value,
+      p_full_name:$('#editFullName').value.trim(),
+      p_email:$('#editEmail').value.trim(),
+      p_phone:$('#editPhone').value.trim(),
+      p_attendance:$('#editAttendance').value,
+      p_food_choice:$('#editAttendance').value==='attending'?$('#editFood').value:null,
+      p_drink_choice:$('#editAttendance').value==='attending'?$('#editDrink').value:null,
+      p_wine_preference:$('#editAttendance').value==='attending'?($('#editWine').value||null):null,
+      p_dietary_requirements:$('#editAttendance').value==='attending'?($('#editDietary').value.trim()||null):null,
+      p_photography_option:$('#editAttendance').value==='attending' && $('#editPhotography').value==='true',
+      p_plus_one:$('#editAttendance').value==='attending' && $('#editPlusOne').value==='true',
+      p_plus_one_name:$('#editAttendance').value==='attending' && $('#editPlusOne').value==='true'?$('#editPlusOneName').value.trim():null,
+      p_message:$('#editMessage').value.trim()||null
+    };
+    showLoading('Saving RSVP changes...');
+    const {data,error}=await sb.rpc('admin_update_rsvp',payload); hideLoading();
+    if(error){toast('RSVP update failed',error.message,'error');return;} if(!data){toast('RSVP not found','The RSVP may already have been removed.','warning');return;}
+    closeModal('editModal'); toast('RSVP updated','Guest details were saved successfully.'); await loadRsvps();
+  });
+
+  function openDelete(id) {
+    if(!canManage()){toast('Management access required','Scanner accounts cannot delete RSVPs.','warning');return;}
+    const r=state.rsvps.find(x=>x.id===id); if(!r) return;
+    closeModal('detailModal'); $('#deleteRsvpId').value=r.id; $('#deleteGuestName').textContent=`Delete ${r.full_name}`; $('#deleteGuestNumber').textContent=r.guest_number; $('#deleteConfirm').value=''; openModal('deleteModal'); setTimeout(()=>$('#deleteConfirm').focus(),100);
+  }
+
+  $('#deleteForm').addEventListener('submit', async e=>{
+    e.preventDefault(); if(!canManage()) return;
+    const id=$('#deleteRsvpId').value; const r=state.rsvps.find(x=>x.id===id); if(!r){closeModal('deleteModal');return;}
+    const confirm=$('#deleteConfirm').value.trim();
+    if(confirm.toUpperCase()!==String(r.guest_number).toUpperCase()){toast('Guest number does not match',`Type ${r.guest_number} exactly to confirm deletion.`,'warning');return;}
+    showLoading('Permanently deleting RSVP...');
+    const {data,error}=await sb.rpc('admin_delete_rsvp',{p_rsvp_id:id,p_confirm_guest_number:confirm}); hideLoading();
+    if(error){toast('Delete failed',error.message,'error');return;}
+    if(!data?.success){toast('Delete blocked',data?.error==='CONFIRMATION_MISMATCH'?'Guest number confirmation did not match.':data?.error||'Could not delete this RSVP.','error');return;}
+    closeModal('deleteModal'); toast('RSVP deleted',`${data.full_name} (${data.guest_number}) was permanently removed.`); await loadRsvps();
+  });
+
+  async function resetCheckIn(id,guestType) {
+    if(!canManage()){toast('Management access required','Scanner accounts cannot undo check-ins.','warning');return;}
+    const r=state.rsvps.find(x=>x.id===id); if(!r) return;
+    const name=guestType==='plus_one'?r.plus_one_name:r.full_name;
+    if(!window.confirm(`Undo check-in for ${name}?`)) return;
+    showLoading('Resetting check in...');
+    const {data,error}=await sb.rpc('admin_reset_check_in',{p_rsvp_id:id,p_guest_type:guestType}); hideLoading();
+    if(error){toast('Reset failed',error.message,'error');return;} if(!data?.success){toast('Reset failed',data?.error||'Could not reset check-in.','error');return;}
+    closeModal('detailModal'); toast('Check in reset',`${data.full_name} can now be scanned again.`); await loadRsvps();
+  }
+
   function openPayment(id) {
+    if(!canManage()){toast('Management access required','Scanner accounts cannot update payments.','warning');return;}
     const r=state.rsvps.find(x=>x.id===id); if(!r) return;
     $('#paymentRsvpId').value=r.id; $('#paymentStatus').value=r.payment_status||'pending'; $('#paymentReference').value=r.payment_reference||''; $('#paymentSubtitle').textContent=`${r.full_name} · ${r.guest_number} · ${money(r.payment_amount)}`; openModal('paymentModal');
   }
@@ -652,14 +813,15 @@
 
   function setView(view) {
     state.view=view; $$('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${view}`)); $$('.nav-btn[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
-    const titles={overview:'Overview',guests:'Guest List',payments:'Payments',checkin:'QR Check In'}; el.topTitle.textContent=titles[view]||'Dashboard'; el.sidebar.classList.remove('open');
+    const titles={overview:'Overview',guests:'Guest List',payments:'Payments',checkin:'QR Check In',activity:'Admin Activity'}; el.topTitle.textContent=titles[view]||'Dashboard'; el.sidebar.classList.remove('open');
   }
   $$('.nav-btn[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
   el.menuBtn.addEventListener('click',()=>el.sidebar.classList.toggle('open'));
   $('#refreshBtn').addEventListener('click',loadRsvps);
+  $('#refreshActivityBtn')?.addEventListener('click',loadRsvps);
 
   $('#exportBtn').addEventListener('click',()=>{
-    const rows=state.filtered.length||(!el.guestSearch.value && el.attendanceFilter.value==='all' && el.paymentFilter.value==='all') ? state.filtered : [];
+    const rows=state.filtered;
     if(!rows.length){toast('Nothing to export','No guests match the current filters.','warning');return;}
     const headers=['Guest Number','Full Name','Email','Phone','Attendance','Plus One','Plus One Name','Plus One Number','Food','Drinks','Wine','Dietary Requirements','Photography','Buffet Amount','Payment Status','Payment Reference','Main Check In','Plus One Check In','Guest Email','Host Email','Submitted'];
     const values=rows.map(r=>[r.guest_number,r.full_name,r.email,r.phone,r.attendance,r.plus_one?'Yes':'No',r.plus_one_name||'',r.plus_one_guest_number||'',r.food_choice||'',r.drink_choice||'',r.wine_preference||'',r.dietary_requirements||'',r.photography_option?'Yes':'No',r.payment_amount,r.payment_status,r.payment_reference||'',r.check_in_status,r.plus_one_check_in_status||'',r.guest_email_status,r.host_email_status,r.created_at]);
