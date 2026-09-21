@@ -1021,6 +1021,214 @@
       animation:particleBurst 1.4s var(--delay) var(--ease-luxury) forwards;
     }
 
+
+
+    /* =========================================================
+       QR INVITATION VERIFICATION
+    ========================================================= */
+    #verificationScene{
+      background:
+        radial-gradient(circle at 50% 12%,rgba(201,164,100,.14),transparent 30%),
+        radial-gradient(circle at 12% 88%,rgba(201,164,100,.07),transparent 28%),
+        var(--black);
+      color:var(--ivory);
+    }
+    .verify-shell{
+      position:relative;
+      width:min(680px,100%);
+      margin:auto;
+      padding:clamp(26px,6vw,52px) 0;
+      text-align:center;
+    }
+    .verify-monogram{
+      width:76px;height:76px;
+      margin:0 auto 20px;
+      display:grid;place-items:center;
+      border:1px solid rgba(201,164,100,.55);
+      border-radius:50%;
+      color:var(--gold-soft);
+      font-family:"Cormorant Garamond",serif;
+      font-size:2.35rem;
+      box-shadow:inset 0 0 0 7px rgba(201,164,100,.05),0 18px 48px rgba(0,0,0,.28);
+    }
+    .verify-eyebrow{
+      margin:0;
+      color:var(--gold);
+      font-size:.68rem;
+      font-weight:800;
+      letter-spacing:.24em;
+      text-transform:uppercase;
+    }
+    .verify-title{
+      margin:13px 0 9px;
+      color:var(--ivory);
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(2.55rem,9vw,5rem);
+      font-weight:500;
+      line-height:.95;
+      letter-spacing:-.035em;
+    }
+    .verify-subtitle{
+      width:min(520px,94%);
+      margin:0 auto 24px;
+      color:#a7a098;
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(1.05rem,3.5vw,1.32rem);
+      line-height:1.6;
+    }
+    .verify-card{
+      width:min(590px,100%);
+      margin:0 auto;
+      overflow:hidden;
+      background:var(--ivory);
+      color:#111;
+      border:1px solid rgba(201,164,100,.68);
+      border-radius:22px;
+      box-shadow:0 32px 90px rgba(0,0,0,.34);
+    }
+    .verify-card-top{
+      padding:22px 22px 20px;
+      background:#0d0d0d;
+      color:var(--ivory);
+      border-bottom:1px solid rgba(201,164,100,.4);
+    }
+    .verify-status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border:1px solid rgba(201,164,100,.44);
+      border-radius:999px;
+      color:var(--gold-soft);
+      background:rgba(201,164,100,.08);
+      font-size:.66rem;
+      font-weight:800;
+      letter-spacing:.13em;
+      text-transform:uppercase;
+    }
+    .verify-status-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:#7f9a72;
+      box-shadow:0 0 0 5px rgba(127,154,114,.12);
+    }
+    .verify-status.checked .verify-status-dot{background:var(--gold)}
+    .verify-status.invalid{
+      color:#e5b1b6;
+      border-color:rgba(165,79,93,.5);
+      background:rgba(165,79,93,.08);
+    }
+    .verify-status.invalid .verify-status-dot{background:#b65f69;box-shadow:0 0 0 5px rgba(182,95,105,.12)}
+    .verify-person{
+      padding:30px 24px 27px;
+      text-align:center;
+    }
+    .verify-guest-type{
+      color:#8b7a63;
+      font-size:.67rem;
+      font-weight:800;
+      letter-spacing:.17em;
+      text-transform:uppercase;
+    }
+    .verify-name{
+      margin:8px 0 5px;
+      font-family:"Cormorant Garamond",serif;
+      font-size:clamp(2.15rem,8vw,3.9rem);
+      line-height:1;
+      font-weight:600;
+      color:#111;
+    }
+    .verify-number{
+      color:#a0783c;
+      font-size:.83rem;
+      font-weight:800;
+      letter-spacing:.13em;
+    }
+    .verify-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      border-top:1px solid #ded3c1;
+      background:#fff;
+    }
+    .verify-item{
+      min-height:94px;
+      padding:17px 18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:5px;
+      text-align:left;
+      border-bottom:1px solid #ece3d6;
+    }
+    .verify-item:nth-child(odd){border-right:1px solid #ece3d6}
+    .verify-label{
+      color:#8e867d;
+      font-size:.62rem;
+      font-weight:800;
+      letter-spacing:.13em;
+      text-transform:uppercase;
+    }
+    .verify-value{
+      color:#1b1b1b;
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.16rem;
+      font-weight:600;
+      line-height:1.25;
+    }
+    .verify-note{
+      padding:20px 24px;
+      color:#766e66;
+      background:#f1e9dc;
+      font-size:.75rem;
+      line-height:1.65;
+    }
+    .verify-actions{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:22px;
+    }
+    .verify-loading{
+      padding:36px 24px;
+      color:#6d665f;
+      font-family:"Cormorant Garamond",serif;
+      font-size:1.25rem;
+    }
+    .verify-spinner{
+      width:34px;height:34px;
+      margin:0 auto 15px;
+      border:2px solid rgba(201,164,100,.24);
+      border-top-color:var(--gold);
+      border-radius:50%;
+      animation:verifySpin .8s linear infinite;
+    }
+    .verify-error{
+      display:none;
+      padding:34px 24px 30px;
+      text-align:center;
+    }
+    .verify-error.show{display:block}
+    .verify-error h3{
+      margin:10px 0 8px;
+      color:#111;
+      font-family:"Cormorant Garamond",serif;
+      font-size:2rem;
+    }
+    .verify-error p{
+      width:min(430px,100%);
+      margin:0 auto;
+      color:#756d65;
+      font-size:.78rem;
+      line-height:1.65;
+    }
+    @keyframes verifySpin{to{transform:rotate(360deg)}}
+    @media (max-width:560px){
+      .verify-grid{grid-template-columns:1fr}
+      .verify-item:nth-child(odd){border-right:0}
+      .verify-item{min-height:78px;text-align:center}
+      .verify-card{border-radius:18px}
+    }
+
     /* =========================================================
        MUSIC
     ========================================================= */
@@ -1537,6 +1745,93 @@
       </div>
     </section>
 
+
+
+    <!-- ======================================================
+         QR INVITATION VERIFICATION
+    ======================================================= -->
+    <section class="scene" id="verificationScene" aria-hidden="true" aria-labelledby="verificationTitle">
+      <div class="ambient" aria-hidden="true">
+        <div class="orb one"></div>
+        <div class="orb two"></div>
+      </div>
+
+      <div class="verify-shell">
+        <div class="verify-monogram" aria-hidden="true">N</div>
+        <p class="verify-eyebrow">Nico's Birthday Celebration</p>
+        <h1 class="verify-title" id="verificationTitle">Invitation Verification</h1>
+        <p class="verify-subtitle" id="verificationSubtitle">Checking this digital invitation securely.</p>
+
+        <div class="verify-card" aria-live="polite">
+          <div class="verify-card-top">
+            <div class="verify-status" id="verifyStatus">
+              <span class="verify-status-dot" aria-hidden="true"></span>
+              <span id="verifyStatusText">Verifying Invitation</span>
+            </div>
+          </div>
+
+          <div class="verify-loading" id="verifyLoading">
+            <div class="verify-spinner" aria-hidden="true"></div>
+            Please wait while we verify this invitation.
+          </div>
+
+          <div id="verifyContent" hidden>
+            <div class="verify-person">
+              <div class="verify-guest-type" id="verifyGuestType">Guest</div>
+              <div class="verify-name" id="verifyName"></div>
+              <div class="verify-number" id="verifyGuestNumber"></div>
+            </div>
+
+            <div class="verify-grid">
+              <div class="verify-item">
+                <span class="verify-label">Event</span>
+                <span class="verify-value" id="verifyEvent"></span>
+              </div>
+              <div class="verify-item">
+                <span class="verify-label">Date</span>
+                <span class="verify-value" id="verifyDate"></span>
+              </div>
+              <div class="verify-item">
+                <span class="verify-label">Time</span>
+                <span class="verify-value" id="verifyTime"></span>
+              </div>
+              <div class="verify-item">
+                <span class="verify-label">Venue</span>
+                <span class="verify-value" id="verifyVenue"></span>
+              </div>
+              <div class="verify-item">
+                <span class="verify-label">Payment</span>
+                <span class="verify-value" id="verifyPayment"></span>
+              </div>
+              <div class="verify-item">
+                <span class="verify-label">Check In</span>
+                <span class="verify-value" id="verifyCheckIn"></span>
+              </div>
+            </div>
+
+            <div class="verify-note">
+              This invitation is personal to the guest named above. Please keep the QR link private and present it when requested at the event.
+            </div>
+          </div>
+
+          <div class="verify-error" id="verifyError">
+            <h3>Invitation not verified</h3>
+            <p id="verifyErrorText">This QR invitation could not be verified. Please contact Nico if you believe this is an error.</p>
+          </div>
+        </div>
+
+        <div class="verify-actions">
+          <button class="btn" id="returnToInvitation" type="button">
+            <span>Open Invitation</span>
+          </button>
+          <a class="btn secondary" id="verifyContact" href="https://wa.me/27686602742" target="_blank" rel="noopener noreferrer">
+            <span>Contact Nico</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+
     <!-- ======================================================
          STAGE 5 RSVP CONFIRMATION
     ======================================================= -->
@@ -1608,6 +1903,7 @@
     const SUPABASE_URL = "https://wezwgttczzskmgchbfaf.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iWIWWfzE-3q57OKapQPMrw_K2zzd3W9";
     const RSVP_ENDPOINT = `${SUPABASE_URL}/functions/v1/submit-rsvp`;
+    const VERIFY_RSVP_ENDPOINT = `${SUPABASE_URL}/rest/v1/rpc/verify_nico_rsvp`;
 
     // Kept only as an organiser contact number, not as the RSVP database.
     const RSVP_WHATSAPP_NUMBER = "27686602742";
@@ -1628,6 +1924,7 @@
     const detailsScene = document.getElementById("detailsScene");
     const rsvpScene = document.getElementById("rsvpScene");
     const confirmationScene = document.getElementById("confirmationScene");
+    const verificationScene = document.getElementById("verificationScene");
 
     const nextButton = document.getElementById("nextButton");
     const rsvpButton = document.getElementById("rsvpButton");
@@ -2185,6 +2482,125 @@
       container.appendChild(fragment);
     }
 
+
+
+    // =========================================================
+    // QR INVITATION VERIFICATION
+    // =========================================================
+
+    function titleCaseStatus(value) {
+      return String(value || "")
+        .replaceAll("_", " ")
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    }
+
+    function showVerificationError(message) {
+      const loading = document.getElementById("verifyLoading");
+      const content = document.getElementById("verifyContent");
+      const errorBox = document.getElementById("verifyError");
+      const errorText = document.getElementById("verifyErrorText");
+      const status = document.getElementById("verifyStatus");
+      const statusText = document.getElementById("verifyStatusText");
+      const subtitle = document.getElementById("verificationSubtitle");
+
+      loading.hidden = true;
+      content.hidden = true;
+      errorBox.classList.add("show");
+      errorText.textContent = message;
+      status.classList.remove("checked");
+      status.classList.add("invalid");
+      statusText.textContent = "Not Verified";
+      subtitle.textContent = "We could not confirm this digital invitation.";
+    }
+
+    function renderVerifiedInvitation(record) {
+      const loading = document.getElementById("verifyLoading");
+      const content = document.getElementById("verifyContent");
+      const errorBox = document.getElementById("verifyError");
+      const status = document.getElementById("verifyStatus");
+      const statusText = document.getElementById("verifyStatusText");
+      const subtitle = document.getElementById("verificationSubtitle");
+
+      loading.hidden = true;
+      errorBox.classList.remove("show");
+      content.hidden = false;
+
+      const checkedIn = record.check_in_status === "checked_in";
+      status.classList.toggle("checked", checkedIn);
+      status.classList.remove("invalid");
+      statusText.textContent = checkedIn ? "Already Checked In" : "Valid Invitation";
+      subtitle.textContent = checkedIn
+        ? "This guest has already been checked in for the celebration."
+        : "This digital invitation is valid for Nico's birthday celebration.";
+
+      document.getElementById("verifyGuestType").textContent =
+        record.guest_type === "plus_one" ? "Plus One Guest" : "Primary Guest";
+      document.getElementById("verifyName").textContent = record.full_name || "Guest";
+      document.getElementById("verifyGuestNumber").textContent = record.guest_number || "";
+      document.getElementById("verifyEvent").textContent = record.event_name || INVITATION.title;
+      document.getElementById("verifyDate").textContent = record.event_date || INVITATION.dateLabel;
+      document.getElementById("verifyTime").textContent = record.event_time || INVITATION.arrival;
+      document.getElementById("verifyVenue").textContent = record.venue || `${INVITATION.venue}, ${INVITATION.location}`;
+      document.getElementById("verifyPayment").textContent = titleCaseStatus(record.payment_status || "pending");
+      document.getElementById("verifyCheckIn").textContent = checkedIn ? "Checked In" : "Not Checked In";
+    }
+
+    async function initializeQrVerification() {
+      const qrToken = new URLSearchParams(window.location.search).get("qr");
+      if (!qrToken) return false;
+
+      curtainStage.style.display = "none";
+      [heroScene, detailsScene, rsvpScene, confirmationScene].forEach((scene) => {
+        scene.classList.remove("active", "exiting");
+        scene.setAttribute("aria-hidden", "true");
+      });
+
+      verificationScene.classList.add("active");
+      verificationScene.setAttribute("aria-hidden", "false");
+      document.body.classList.add("verification-mode");
+
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidPattern.test(qrToken)) {
+        showVerificationError("This QR link is not valid. Please use the original invitation email or contact Nico for assistance.");
+        return true;
+      }
+
+      try {
+        const response = await fetch(VERIFY_RSVP_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_PUBLISHABLE_KEY
+          },
+          body: JSON.stringify({ p_qr_token: qrToken })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Verification service returned ${response.status}`);
+        }
+
+        const records = await response.json();
+        const record = Array.isArray(records) ? records[0] : null;
+
+        if (!record || !record.guest_number) {
+          showVerificationError("This QR invitation was not found. It may be invalid or no longer active. Please contact Nico if you need assistance.");
+          return true;
+        }
+
+        renderVerifiedInvitation(record);
+      } catch (error) {
+        console.error("QR verification failed:", error);
+        showVerificationError("We could not reach the verification service right now. Please try again shortly or contact Nico for assistance.");
+      }
+
+      return true;
+    }
+
+    document.getElementById("returnToInvitation").addEventListener("click", () => {
+      window.location.href = `${window.location.origin}${window.location.pathname}`;
+    });
+
+
     // =========================================================
     // MUSIC
     // =========================================================
@@ -2229,6 +2645,7 @@
       }
     });
 
+    initializeQrVerification();
     configureMusic();
 
     // =========================================================
