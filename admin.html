@@ -259,9 +259,64 @@
     .scan-kicker{font-size:9px;text-transform:uppercase;letter-spacing:1.8px;font-weight:800;color:var(--gold);margin-bottom:8px}
     .scan-name{font-family:"Cormorant Garamond",serif;font-size:38px;line-height:.98;color:var(--ivory);font-weight:700;margin:0 0 8px}
     .scan-number{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--gold-soft);font-weight:800;font-size:12px;letter-spacing:.4px}
-    .scan-seat{margin-top:14px;display:inline-flex;align-items:center;gap:12px;padding:11px 16px;border:1px solid rgba(201,164,100,.45);background:rgba(201,164,100,.08);border-radius:14px}
-    .scan-seat span{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);font-weight:800}
-    .scan-seat strong{font-family:"Cormorant Garamond",serif;font-size:36px;line-height:.85;color:#fff;font-weight:700}
+
+    /* Premium seat reveal shown immediately after a successful QR scan */
+    .scan-seat-card{
+      position:relative;
+      margin:18px 18px 0;
+      padding:46px 24px 26px;
+      border:2px solid rgba(227,197,140,.78);
+      border-radius:30px;
+      background:
+        radial-gradient(circle at 50% 42%,rgba(201,164,100,.08),transparent 38%),
+        #050505;
+      text-align:center;
+      overflow:hidden;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.03),0 18px 45px rgba(0,0,0,.45),0 0 32px rgba(201,164,100,.08);
+    }
+    .scan-seat-card:before,.scan-seat-card:after{
+      content:"";position:absolute;width:62px;height:62px;pointer-events:none;
+    }
+    .scan-seat-card:before{left:-2px;top:-2px;border-left:7px solid #fff;border-top:7px solid #fff;border-radius:28px 0 0 0}
+    .scan-seat-card:after{right:-2px;bottom:-2px;border-right:7px solid #fff;border-bottom:7px solid #fff;border-radius:0 0 28px 0}
+    .scan-seat-title{
+      margin:0;
+      font-family:Manrope,system-ui,sans-serif;
+      font-size:clamp(54px,11vw,92px);
+      line-height:.95;
+      letter-spacing:-4px;
+      font-weight:900;
+      color:#f0c873;
+      text-shadow:0 4px 20px rgba(201,164,100,.12);
+    }
+    .scan-seat-divider{width:min(78%,430px);height:1px;margin:18px auto 14px;background:linear-gradient(90deg,transparent,rgba(227,197,140,.55),transparent)}
+    .scan-seat-name{
+      margin:0;
+      color:#efc66f;
+      font-family:Manrope,system-ui,sans-serif;
+      font-size:clamp(25px,5vw,42px);
+      line-height:1.12;
+      font-weight:500;
+      letter-spacing:.2px;
+    }
+    .scan-seat-meta{margin-top:10px;color:#8f887f;font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+    .scan-next-btn{
+      width:min(86%,470px);
+      min-height:68px;
+      margin-top:28px;
+      border:0;
+      border-radius:999px;
+      background:linear-gradient(180deg,#efd296,#dfb86b);
+      color:#080808;
+      font-family:Manrope,system-ui,sans-serif;
+      font-size:clamp(20px,4.3vw,32px);
+      font-weight:900;
+      letter-spacing:1.5px;
+      text-transform:uppercase;
+      box-shadow:0 12px 32px rgba(201,164,100,.16);
+    }
+    .scan-next-btn:active{transform:scale(.985)}
+    .scan-result-note{padding:15px 20px 0;color:var(--muted);font-size:10px;text-align:center;line-height:1.6}
     .seat-badge{display:inline-flex;align-items:center;justify-content:center;min-width:66px;padding:7px 10px;border-radius:10px;border:1px solid rgba(201,164,100,.34);background:rgba(201,164,100,.08);color:var(--gold-soft);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:900;letter-spacing:.5px}
     .export-slot{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
     .scan-details{padding:17px 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
@@ -271,7 +326,7 @@
     .scan-detail.full{grid-column:1/-1}
     .scan-actions{padding:0 20px 20px;display:flex;gap:9px;flex-wrap:wrap}
     .scan-actions .outline-btn,.scan-actions .gold-btn{flex:1;min-width:160px}
-    @media(max-width:650px){.scanner-box{aspect-ratio:3/4;max-height:62vh}.scanner-frame{width:min(76%,300px)}.scan-details{grid-template-columns:1fr}.scan-detail.full{grid-column:auto}.scan-name{font-size:34px}.scan-seat strong{font-size:32px}}
+    @media(max-width:650px){.scanner-box{aspect-ratio:3/4;max-height:62vh}.scanner-frame{width:min(76%,300px)}.scan-details{grid-template-columns:1fr}.scan-detail.full{grid-column:auto}.scan-name{font-size:34px}.scan-seat-card{margin:14px 12px 0;padding:38px 18px 22px;border-radius:25px}.scan-seat-title{letter-spacing:-3px}.scan-next-btn{min-height:62px;width:92%;margin-top:24px}}
 
     .modal-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--line-soft)}
     .danger-zone{margin-top:22px;padding:18px;border:1px solid rgba(168,91,102,.35);background:rgba(168,91,102,.06);border-radius:15px}
@@ -1102,14 +1157,15 @@
 
     box.className='scan-result show success';
     box.innerHTML=`
-      <div class="scan-hero ${heroClass}">
-        <div class="scan-kicker">${esc(statusTitle)}</div>
-        <div class="scan-name">${esc(data.full_name||'Guest')}</div>
-        <div class="scan-number">${esc(data.guest_number||'')}</div>
-        <div class="scan-seat"><span>Allocated seat</span><strong>${seatLabel==='—'?'Not set':`Seat ${esc(seatLabel)}`}</strong></div>
+      <div class="scan-seat-card">
+        <div class="scan-seat-title">${seatLabel==='—'?'Seat —':`Seat ${esc(seatLabel)}`}</div>
+        <div class="scan-seat-divider"></div>
+        <div class="scan-seat-name">${esc(data.full_name||'Guest')}</div>
+        <div class="scan-seat-meta">${esc(data.guest_number||'')} · ${esc(isPlus?'Plus one':'Primary guest')}</div>
+        <button id="scanAnotherBtn" class="scan-next-btn" type="button">Scan Next</button>
       </div>
-      <div class="scan-details">${details}</div>
-      <div class="scan-actions"><button id="scanAnotherBtn" class="gold-btn">Scan Another Guest</button></div>`;
+      <div class="scan-result-note">${already?'This guest was already checked in. Their allocated seat remains unchanged.':'Admission confirmed. RSVP details are shown below.'}</div>
+      <div class="scan-details">${details}</div>`;
 
     $('#scanAnotherBtn').addEventListener('click',()=>{
       box.className='scan-result';
