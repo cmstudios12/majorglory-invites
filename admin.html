@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
   <style>
     :root{
@@ -239,14 +240,33 @@
     .section-label{margin:22px 0 10px;font-size:9px;text-transform:uppercase;letter-spacing:1.7px;color:var(--gold);font-weight:800}
 
     /* Scanner */
-    .scanner-box{position:relative;aspect-ratio:4/3;max-height:430px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#050505;display:grid;place-items:center}
-    .scanner-box video{width:100%;height:100%;object-fit:cover}
-    .scanner-frame{position:absolute;width:min(62%,280px);aspect-ratio:1;border:2px solid var(--gold-soft);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.34);pointer-events:none}
-    .scanner-line{position:absolute;left:10%;right:10%;height:1px;background:var(--gold-soft);box-shadow:0 0 10px var(--gold);animation:scanLine 2.2s ease-in-out infinite}
-    @keyframes scanLine{0%,100%{top:14%}50%{top:86%}}
+    .scanner-box{position:relative;aspect-ratio:4/3;max-height:520px;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#020202;display:grid;place-items:center;isolation:isolate}
+    .scanner-box video{width:100%;height:100%;object-fit:cover;filter:none!important;transform:translateZ(0);background:#020202}
+    .scanner-frame{position:absolute;width:min(68%,310px);aspect-ratio:1;border:2px solid var(--gold-soft);border-radius:20px;box-shadow:0 0 0 999px rgba(0,0,0,.25),0 0 30px rgba(201,164,100,.14);pointer-events:none;z-index:2}
+    .scanner-frame:before,.scanner-frame:after{content:"";position:absolute;width:38px;height:38px;border-color:#fff;opacity:.9}
+    .scanner-frame:before{left:-2px;top:-2px;border-left:4px solid;border-top:4px solid;border-radius:18px 0 0 0}
+    .scanner-frame:after{right:-2px;bottom:-2px;border-right:4px solid;border-bottom:4px solid;border-radius:0 0 18px 0}
+    .scanner-line{position:absolute;left:8%;right:8%;height:2px;background:linear-gradient(90deg,transparent,var(--gold-soft),#fff,var(--gold-soft),transparent);box-shadow:0 0 14px var(--gold);animation:scanLine 1.35s ease-in-out infinite}
+    @keyframes scanLine{0%,100%{top:12%;opacity:.55}50%{top:88%;opacity:1}}
+    .scanner-status{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;min-width:210px;max-width:88%;padding:9px 13px;border-radius:999px;background:rgba(7,7,7,.82);border:1px solid rgba(201,164,100,.25);backdrop-filter:blur(10px);color:#f3eadb;font-size:9px;font-weight:800;letter-spacing:.5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .scanner-note{text-align:center;color:var(--muted);font-size:10px;line-height:1.7;margin-top:12px}
-    .scan-result{margin-top:14px;padding:16px;border-radius:13px;border:1px solid var(--line-soft);background:#111;display:none}.scan-result.show{display:block}.scan-result.success{border-color:rgba(127,152,119,.34)}.scan-result.error{border-color:rgba(168,91,102,.4)}
-    .scan-result h4{margin:0 0 5px;font-family:"Cormorant Garamond",serif;font-size:25px}.scan-result p{margin:0;color:var(--muted);font-size:11px;line-height:1.65}
+    .scan-result{margin-top:14px;padding:0;border-radius:18px;border:1px solid var(--line-soft);background:#0d0d0d;display:none;overflow:hidden}.scan-result.show{display:block}.scan-result.success{border-color:rgba(127,152,119,.42)}.scan-result.error{border-color:rgba(168,91,102,.45)}
+    .scan-result h4{margin:0;font-family:"Cormorant Garamond",serif;font-size:30px;line-height:1}.scan-result p{margin:0;color:var(--muted);font-size:11px;line-height:1.65}
+    .scan-hero{padding:20px;background:linear-gradient(145deg,#161616,#0b0b0b);border-bottom:1px solid var(--line-soft)}
+    .scan-hero.success{background:linear-gradient(145deg,rgba(127,152,119,.16),#0b0b0b 72%)}
+    .scan-hero.warning{background:linear-gradient(145deg,rgba(194,154,76,.14),#0b0b0b 72%)}
+    .scan-hero.error{background:linear-gradient(145deg,rgba(168,91,102,.15),#0b0b0b 72%)}
+    .scan-kicker{font-size:9px;text-transform:uppercase;letter-spacing:1.8px;font-weight:800;color:var(--gold);margin-bottom:8px}
+    .scan-name{font-family:"Cormorant Garamond",serif;font-size:38px;line-height:.98;color:var(--ivory);font-weight:700;margin:0 0 8px}
+    .scan-number{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--gold-soft);font-weight:800;font-size:12px;letter-spacing:.4px}
+    .scan-details{padding:17px 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+    .scan-detail{padding:12px;border:1px solid var(--line-soft);background:#111;border-radius:12px;min-width:0}
+    .scan-detail small{display:block;font-size:8px;text-transform:uppercase;letter-spacing:1.2px;font-weight:800;color:#77716b;margin-bottom:5px}
+    .scan-detail strong{display:block;color:#fff;font-size:12px;line-height:1.45;word-break:break-word;font-weight:800}
+    .scan-detail.full{grid-column:1/-1}
+    .scan-actions{padding:0 20px 20px;display:flex;gap:9px;flex-wrap:wrap}
+    .scan-actions .outline-btn,.scan-actions .gold-btn{flex:1;min-width:160px}
+    @media(max-width:650px){.scanner-box{aspect-ratio:3/4;max-height:62vh}.scanner-frame{width:min(76%,300px)}.scan-details{grid-template-columns:1fr}.scan-detail.full{grid-column:auto}.scan-name{font-size:34px}}
 
     .modal-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--line-soft)}
     .danger-zone{margin-top:22px;padding:18px;border:1px solid rgba(168,91,102,.35);background:rgba(168,91,102,.06);border-radius:15px}
@@ -505,8 +525,8 @@
   <div id="scannerModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="scannerTitle">
     <div class="modal"><div class="modal-head"><div><h3 id="scannerTitle">Guest QR Check In</h3><p>Scan the QR from the guest's invitation email</p></div><button class="icon-btn" data-close="scannerModal" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></button></div><div class="modal-body">
       <div id="scannerUnsupported" class="hidden" style="padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:11px;line-height:1.7;margin-bottom:14px">Automatic QR detection is not available in this browser. You can still paste the guest's QR URL or UUID below.</div>
-      <div class="scanner-box" id="scannerBox"><video id="scannerVideo" playsinline muted></video><div class="scanner-frame"><div class="scanner-line"></div></div></div>
-      <div class="scanner-note">Allow camera access and place the QR code inside the square. For best results, use the rear camera on a phone over HTTPS.</div>
+      <div class="scanner-box" id="scannerBox"><video id="scannerVideo" playsinline muted autoplay></video><div class="scanner-frame"><div class="scanner-line"></div></div><div id="scannerStatus" class="scanner-status">Starting rear camera...</div></div>
+      <div class="scanner-note">Hold the QR steady anywhere inside the gold frame. The scanner checks continuously and admits the guest automatically as soon as it reads the code.</div>
       <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:16px"><input id="manualQr" class="dark-control" placeholder="Paste QR URL or UUID"><button id="manualCheckBtn" class="outline-btn">Check In</button></div>
       <div id="scanResult" class="scan-result"></div>
     </div></div>
@@ -525,7 +545,7 @@
 
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
-  const state = { admin:null, user:null, rsvps:[], filtered:[], audit:[], view:'overview', scannerStream:null, detector:null, scanLoop:null, scanning:false };
+  const state = { admin:null, user:null, rsvps:[], filtered:[], audit:[], view:'overview', scannerStream:null, detector:null, scanLoop:null, scanning:false, scanBusy:false, scanCanvas:null, scanCtx:null, lastScanFrame:0, detectorFailures:0 };
 
   const el = {
     authShell: $('#authShell'), appShell: $('#appShell'), loginForm: $('#loginForm'), loginBtn: $('#loginBtn'), loginError: $('#loginError'),
@@ -829,33 +849,297 @@
   });
 
   $$('[data-open-scanner]').forEach(b=>b.addEventListener('click',openScanner));
-  async function openScanner(){ openModal('scannerModal'); $('#scanResult').className='scan-result'; $('#scanResult').innerHTML=''; $('#manualQr').value=''; await startScanner(); }
+  async function openScanner(){
+    openModal('scannerModal');
+    $('#scanResult').className='scan-result';
+    $('#scanResult').innerHTML='';
+    $('#manualQr').value='';
+    setScannerStatus('Starting rear camera...');
+    await startScanner();
+  }
+
+  function setScannerStatus(message){
+    const node=$('#scannerStatus');
+    if(node) node.textContent=message;
+  }
 
   async function startScanner(){
     stopScanner();
-    if(!navigator.mediaDevices?.getUserMedia){ $('#scannerUnsupported').classList.remove('hidden'); return; }
+    $('#scannerUnsupported').classList.add('hidden');
+    $('#scannerUnsupported').textContent='Automatic QR detection is not available in this browser. You can still paste the guest\'s QR URL or UUID below.';
+
+    if(!navigator.mediaDevices?.getUserMedia){
+      $('#scannerUnsupported').classList.remove('hidden');
+      setScannerStatus('Camera unavailable');
+      return;
+    }
+
     try {
-      if('BarcodeDetector' in window){ state.detector=new BarcodeDetector({formats:['qr_code']}); $('#scannerUnsupported').classList.add('hidden'); }
-      else { state.detector=null; $('#scannerUnsupported').classList.remove('hidden'); }
-      state.scannerStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false}); const video=$('#scannerVideo'); video.srcObject=state.scannerStream; await video.play();
-      if(state.detector){ state.scanning=true; scanFrame(); }
-    } catch(err){ console.error(err); $('#scannerUnsupported').classList.remove('hidden'); $('#scannerUnsupported').textContent='Camera access could not be started. Check browser permission or paste the QR URL/UUID below.'; }
+      state.detector=null;
+      state.detectorFailures=0;
+
+      if('BarcodeDetector' in window){
+        try {
+          const supported=typeof BarcodeDetector.getSupportedFormats==='function' ? await BarcodeDetector.getSupportedFormats() : ['qr_code'];
+          if(!supported?.length || supported.includes('qr_code')) state.detector=new BarcodeDetector({formats:['qr_code']});
+        } catch(err){
+          console.warn('Native QR detector unavailable:',err);
+          state.detector=null;
+        }
+      }
+
+      state.scannerStream=await navigator.mediaDevices.getUserMedia({
+        video:{
+          facingMode:{ideal:'environment'},
+          width:{ideal:1920},
+          height:{ideal:1080},
+          frameRate:{ideal:30,max:60}
+        },
+        audio:false
+      });
+
+      const video=$('#scannerVideo');
+      video.srcObject=state.scannerStream;
+      video.setAttribute('playsinline','');
+      video.muted=true;
+
+      const track=state.scannerStream.getVideoTracks()[0];
+      try {
+        const caps=track.getCapabilities?.()||{};
+        const advanced=[];
+        if(Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')) advanced.push({focusMode:'continuous'});
+        if(Array.isArray(caps.exposureMode) && caps.exposureMode.includes('continuous')) advanced.push({exposureMode:'continuous'});
+        if(Array.isArray(caps.whiteBalanceMode) && caps.whiteBalanceMode.includes('continuous')) advanced.push({whiteBalanceMode:'continuous'});
+        if(advanced.length) await track.applyConstraints({advanced});
+      } catch(err){
+        console.debug('Continuous camera focus not supported:',err);
+      }
+
+      await video.play();
+
+      if(!state.scanCanvas){
+        state.scanCanvas=document.createElement('canvas');
+        state.scanCtx=state.scanCanvas.getContext('2d',{willReadFrequently:true});
+      }
+
+      state.scanning=true;
+      state.scanBusy=false;
+      state.lastScanFrame=0;
+      setScannerStatus(state.detector ? 'Scanning continuously · native + enhanced detection' : 'Scanning continuously · enhanced detection');
+      scanFrame();
+    } catch(err){
+      console.error(err);
+      $('#scannerUnsupported').classList.remove('hidden');
+      $('#scannerUnsupported').textContent='Camera access could not be started. Check camera permission, make sure you are using HTTPS, or paste the QR URL/UUID below.';
+      setScannerStatus('Camera permission required');
+    }
   }
-  function stopScanner(){ state.scanning=false; if(state.scanLoop) cancelAnimationFrame(state.scanLoop); state.scanLoop=null; if(state.scannerStream){ state.scannerStream.getTracks().forEach(t=>t.stop()); state.scannerStream=null; } const v=$('#scannerVideo'); if(v) v.srcObject=null; }
-  async function scanFrame(){ if(!state.scanning||!state.detector) return; const video=$('#scannerVideo'); try { if(video.readyState>=2){ const codes=await state.detector.detect(video); if(codes.length){ const token=parseQrToken(codes[0].rawValue); if(token){ state.scanning=false; await checkIn(token); return; } } } } catch(err){} state.scanLoop=requestAnimationFrame(scanFrame); }
-  function parseQrToken(value){ const s=String(value||'').trim(); if(!s)return null; const uuid=s.match(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i); if(uuid)return uuid[0]; try { const u=new URL(s); const q=u.searchParams.get('qr'); if(q)return parseQrToken(q); } catch{} return null; }
-  $('#manualCheckBtn').addEventListener('click',async()=>{ const token=parseQrToken($('#manualQr').value); if(!token){showScanResult(false,'Invalid QR','Paste the full QR URL or a valid UUID token.');return;} await checkIn(token); });
+
+  function stopScanner(){
+    state.scanning=false;
+    state.scanBusy=false;
+    if(state.scanLoop) cancelAnimationFrame(state.scanLoop);
+    state.scanLoop=null;
+    if(state.scannerStream){ state.scannerStream.getTracks().forEach(t=>t.stop()); state.scannerStream=null; }
+    const v=$('#scannerVideo');
+    if(v) v.srcObject=null;
+  }
+
+  function decodeWithJsQr(video){
+    if(typeof window.jsQR!=='function' || !state.scanCtx || !video.videoWidth || !video.videoHeight) return null;
+
+    const sourceW=video.videoWidth;
+    const sourceH=video.videoHeight;
+    const maxW=1100;
+    const scale=Math.min(1,maxW/sourceW);
+    const w=Math.max(320,Math.round(sourceW*scale));
+    const h=Math.max(240,Math.round(sourceH*scale));
+
+    if(state.scanCanvas.width!==w || state.scanCanvas.height!==h){
+      state.scanCanvas.width=w;
+      state.scanCanvas.height=h;
+    }
+
+    state.scanCtx.drawImage(video,0,0,w,h);
+    const image=state.scanCtx.getImageData(0,0,w,h);
+    const result=window.jsQR(image.data,w,h,{inversionAttempts:'attemptBoth'});
+    return result?.data || null;
+  }
+
+  async function scanFrame(now=performance.now()){
+    if(!state.scanning) return;
+
+    if(state.scanBusy || now-state.lastScanFrame<70){
+      state.scanLoop=requestAnimationFrame(scanFrame);
+      return;
+    }
+
+    const video=$('#scannerVideo');
+    if(!video || video.readyState<2 || !video.videoWidth){
+      state.scanLoop=requestAnimationFrame(scanFrame);
+      return;
+    }
+
+    state.scanBusy=true;
+    state.lastScanFrame=now;
+
+    try {
+      let rawValue=null;
+
+      if(state.detector && state.detectorFailures<4){
+        try {
+          const codes=await state.detector.detect(video);
+          if(codes?.length) rawValue=codes[0].rawValue;
+        } catch(err){
+          state.detectorFailures++;
+          console.debug('Native QR detection miss:',err);
+        }
+      }
+
+      if(!rawValue) rawValue=decodeWithJsQr(video);
+
+      if(rawValue){
+        const token=parseQrToken(rawValue);
+        if(token){
+          state.scanning=false;
+          setScannerStatus('QR detected · verifying guest...');
+          if(navigator.vibrate) navigator.vibrate(80);
+          await checkIn(token);
+          return;
+        }
+      }
+    } catch(err){
+      console.debug('QR scan frame error:',err);
+    } finally {
+      state.scanBusy=false;
+    }
+
+    if(state.scanning) state.scanLoop=requestAnimationFrame(scanFrame);
+  }
+
+  function parseQrToken(value){
+    const s=String(value||'').trim();
+    if(!s)return null;
+    const uuid=s.match(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i);
+    if(uuid)return uuid[0];
+    try { const u=new URL(s); const q=u.searchParams.get('qr'); if(q)return parseQrToken(q); } catch{}
+    return null;
+  }
+
+  $('#manualCheckBtn').addEventListener('click',async()=>{
+    const token=parseQrToken($('#manualQr').value);
+    if(!token){showSimpleScanResult(false,'Invalid QR','Paste the full QR URL or a valid UUID token.');return;}
+    await checkIn(token);
+  });
+
+  function findRsvpForScannedGuest(data){
+    if(!data?.guest_number) return null;
+    return state.rsvps.find(r=>r.guest_number===data.guest_number || r.plus_one_guest_number===data.guest_number) || null;
+  }
+
+  function scanDetail(label,value,full=false){
+    return `<div class="scan-detail${full?' full':''}"><small>${esc(label)}</small><strong>${esc(value ?? 'Not specified')}</strong></div>`;
+  }
+
+  function showGuestScanResult(data,rsvp){
+    const box=$('#scanResult');
+    const isPlus=data.guest_type==='plus_one';
+    const already=Boolean(data.already_checked_in);
+    const heroClass=already?'warning':'success';
+    const statusTitle=already?'Already Checked In':'Guest Checked In';
+    const checkTime=dateTime(data.checked_in_at);
+
+    let details='';
+    details+=scanDetail('Guest type',isPlus?'Plus one':'Primary guest');
+    details+=scanDetail('Check in',already?`Already admitted · ${checkTime}`:`Admitted now · ${checkTime}`);
+
+    if(rsvp){
+      details+=scanDetail('RSVP attendance',human(rsvp.attendance));
+      details+=scanDetail('Payment status',human(rsvp.payment_status));
+      details+=scanDetail('Buffet contribution',money(rsvp.payment_amount));
+
+      if(isPlus){
+        details+=scanDetail('Primary guest',rsvp.full_name);
+        details+=scanDetail('Primary guest number',rsvp.guest_number);
+      } else {
+        details+=scanDetail('Phone',rsvp.phone||'Not provided');
+        details+=scanDetail('Email',rsvp.email||'Not provided',true);
+        details+=scanDetail('Food',rsvp.food_choice||'Not specified');
+        details+=scanDetail('Drinks',rsvp.drink_choice||'Not specified');
+        details+=scanDetail('Wine',rsvp.wine_preference||'No preference');
+        details+=scanDetail('Photography',rsvp.photography_option?'Yes · R50':'No');
+        details+=scanDetail('Dietary requirements',rsvp.dietary_requirements||'None specified',true);
+        details+=scanDetail('Plus one',rsvp.plus_one?`${rsvp.plus_one_name} · ${rsvp.plus_one_guest_number}`:'No',true);
+      }
+    }
+
+    box.className='scan-result show success';
+    box.innerHTML=`
+      <div class="scan-hero ${heroClass}">
+        <div class="scan-kicker">${esc(statusTitle)}</div>
+        <div class="scan-name">${esc(data.full_name||'Guest')}</div>
+        <div class="scan-number">${esc(data.guest_number||'')}</div>
+      </div>
+      <div class="scan-details">${details}</div>
+      <div class="scan-actions"><button id="scanAnotherBtn" class="gold-btn">Scan Another Guest</button></div>`;
+
+    $('#scanAnotherBtn').addEventListener('click',()=>{
+      box.className='scan-result';
+      box.innerHTML='';
+      $('#manualQr').value='';
+      startScanner();
+    });
+  }
+
+  function showSimpleScanResult(ok,title,message,type=''){
+    const box=$('#scanResult');
+    const heroClass=ok?'success':type==='warning'?'warning':'error';
+    box.className=`scan-result show ${ok?'success':'error'}`;
+    box.innerHTML=`
+      <div class="scan-hero ${heroClass}">
+        <div class="scan-kicker">QR Admission</div>
+        <h4 style="color:${ok?'#9ab691':type==='warning'?'#d6b168':'#d2949d'}">${esc(title)}</h4>
+        <p style="margin-top:8px">${esc(message)}</p>
+      </div>
+      <div class="scan-actions"><button id="scanAnotherBtn" class="outline-btn">Scan Another Guest</button></div>`;
+    $('#scanAnotherBtn').addEventListener('click',()=>{
+      box.className='scan-result';
+      box.innerHTML='';
+      $('#manualQr').value='';
+      startScanner();
+    });
+  }
 
   async function checkIn(token){
-    stopScanner(); showScanResult(true,'Checking invitation','Please wait while the guest is verified.');
+    stopScanner();
+    setScannerStatus('Verifying invitation...');
+    const box=$('#scanResult');
+    box.className='scan-result show success';
+    box.innerHTML=`<div class="scan-hero"><div class="scan-kicker">QR detected</div><h4 style="color:var(--gold-soft)">Checking invitation</h4><p style="margin-top:8px">Please wait while the guest is verified.</p></div>`;
+
     const { data, error }=await sb.rpc('admin_check_in_guest',{p_qr_token:token});
-    if(error){showScanResult(false,'Check in failed',error.message);return;}
-    if(!data?.success){ const msg=data?.error==='INVALID_QR'?'This QR code does not match a valid invitation.':data?.error==='NOT_ATTENDING'?`${data.full_name||'This guest'} RSVP'd as not attending.`:'The guest could not be checked in.'; showScanResult(false,'Admission denied',msg); return; }
-    if(data.already_checked_in){showScanResult(false,'Already checked in',`${data.full_name} (${data.guest_number}) was already checked in at ${dateTime(data.checked_in_at)}.`,'warning');}
-    else {showScanResult(true,'Guest checked in',`${data.full_name} · ${data.guest_number} · ${human(data.guest_type)}`); toast('Admission confirmed',`${data.full_name} has been checked in.`);}
+
+    if(error){
+      showSimpleScanResult(false,'Check in failed',error.message);
+      return;
+    }
+
+    if(!data?.success){
+      const msg=data?.error==='INVALID_QR'?'This QR code does not match a valid invitation.':data?.error==='NOT_ATTENDING'?`${data.full_name||'This guest'} RSVP'd as not attending.`:'The guest could not be checked in.';
+      showSimpleScanResult(false,'Admission denied',msg);
+      return;
+    }
+
     await loadRsvps();
+    const rsvp=findRsvpForScannedGuest(data);
+    showGuestScanResult(data,rsvp);
+
+    if(data.already_checked_in){
+      toast('Already checked in',`${data.full_name} was already admitted.`,'warning');
+    } else {
+      toast('Admission confirmed',`${data.full_name} has been checked in.`);
+    }
   }
-  function showScanResult(ok,title,message,type=''){ const box=$('#scanResult'); box.className=`scan-result show ${ok?'success':'error'}`; box.innerHTML=`<h4 style="color:${ok?'#9ab691':type==='warning'?'#d6b168':'#d2949d'}">${esc(title)}</h4><p>${esc(message)}</p><div style="margin-top:12px"><button id="scanAnotherBtn" class="outline-btn">Scan Another Guest</button></div>`; $('#scanAnotherBtn').addEventListener('click',()=>{ box.className='scan-result'; box.innerHTML=''; $('#manualQr').value=''; startScanner(); }); }
 
   init();
 })();
