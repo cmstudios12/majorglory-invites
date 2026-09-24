@@ -250,6 +250,13 @@
     @keyframes scanLine{0%,100%{top:12%;opacity:.55}50%{top:88%;opacity:1}}
     .scanner-status{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;min-width:210px;max-width:88%;padding:9px 13px;border-radius:999px;background:rgba(7,7,7,.82);border:1px solid rgba(201,164,100,.25);backdrop-filter:blur(10px);color:#f3eadb;font-size:9px;font-weight:800;letter-spacing:.5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .scanner-note{text-align:center;color:var(--muted);font-size:10px;line-height:1.7;margin-top:12px}
+    .scanner-stage{display:block;animation:scannerStageIn .24s cubic-bezier(.2,.8,.2,1) both}
+    .scanner-stage.hidden{display:none!important}
+    .scanner-stage.leaving{animation:scannerStageOut .16s ease both;pointer-events:none}
+    @keyframes scannerStageIn{from{opacity:0;transform:translateY(10px) scale(.988)}to{opacity:1;transform:none}}
+    @keyframes scannerStageOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-8px) scale(.992)}}
+    .scanner-result-stage{min-height:430px;display:flex;align-items:center;justify-content:center}
+    .scanner-result-stage .scan-result{width:100%;margin-top:0}
     .scan-result{margin-top:14px;padding:0;border-radius:18px;border:1px solid var(--line-soft);background:#0d0d0d;display:none;overflow:hidden}.scan-result.show{display:block}.scan-result.success{border-color:rgba(127,152,119,.42)}.scan-result.error{border-color:rgba(168,91,102,.45)}
     .scan-result h4{margin:0;font-family:"Cormorant Garamond",serif;font-size:30px;line-height:1}.scan-result p{margin:0;color:var(--muted);font-size:11px;line-height:1.65}
     .scan-hero{padding:20px;background:linear-gradient(145deg,#161616,#0b0b0b);border-bottom:1px solid var(--line-soft)}
@@ -584,11 +591,15 @@
   <!-- Scanner Modal -->
   <div id="scannerModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="scannerTitle">
     <div class="modal"><div class="modal-head"><div><h3 id="scannerTitle">Guest QR Check In</h3><p>Scan the QR from the guest's invitation email</p></div><button class="icon-btn" data-close="scannerModal" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></button></div><div class="modal-body">
-      <div id="scannerUnsupported" class="hidden" style="padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:11px;line-height:1.7;margin-bottom:14px">Automatic QR detection is not available in this browser. You can still paste the guest's QR URL or UUID below.</div>
-      <div class="scanner-box" id="scannerBox"><video id="scannerVideo" playsinline muted autoplay></video><div class="scanner-frame"><div class="scanner-line"></div></div><div id="scannerStatus" class="scanner-status">Starting rear camera...</div></div>
-      <div class="scanner-note">Hold the QR steady anywhere inside the gold frame. The scanner checks continuously and admits the guest automatically as soon as it reads the code.</div>
-      <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:16px"><input id="manualQr" class="dark-control" placeholder="Paste QR URL or UUID"><button id="manualCheckBtn" class="outline-btn">Check In</button></div>
-      <div id="scanResult" class="scan-result"></div>
+      <div id="scannerCaptureStage" class="scanner-stage">
+        <div id="scannerUnsupported" class="hidden" style="padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:11px;line-height:1.7;margin-bottom:14px">Automatic QR detection is not available in this browser. You can still paste the guest's QR URL or UUID below.</div>
+        <div class="scanner-box" id="scannerBox"><video id="scannerVideo" playsinline muted autoplay></video><div class="scanner-frame"><div class="scanner-line"></div></div><div id="scannerStatus" class="scanner-status">Starting rear camera...</div></div>
+        <div class="scanner-note">Hold the QR steady anywhere inside the gold frame. The scanner checks continuously and admits the guest automatically as soon as it reads the code.</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:16px"><input id="manualQr" class="dark-control" placeholder="Paste QR URL or UUID"><button id="manualCheckBtn" class="outline-btn">Check In</button></div>
+      </div>
+      <div id="scannerResultStage" class="scanner-stage scanner-result-stage hidden">
+        <div id="scanResult" class="scan-result"></div>
+      </div>
     </div></div>
   </div>
 
@@ -928,11 +939,52 @@
   });
 
   $$('[data-open-scanner]').forEach(b=>b.addEventListener('click',openScanner));
+
+  function showScannerCaptureStage(){
+    const capture=$('#scannerCaptureStage');
+    const result=$('#scannerResultStage');
+    const modal=$('#scannerModal .modal');
+    if(modal) modal.scrollTop=0;
+    result.classList.add('hidden');
+    result.classList.remove('leaving');
+    capture.classList.remove('hidden','leaving');
+    capture.style.animation='none';
+    void capture.offsetWidth;
+    capture.style.animation='';
+  }
+
+  function showScannerResultStage(){
+    const capture=$('#scannerCaptureStage');
+    const result=$('#scannerResultStage');
+    const modal=$('#scannerModal .modal');
+    if(modal) modal.scrollTop=0;
+    capture.classList.add('hidden');
+    capture.classList.remove('leaving');
+    result.classList.remove('hidden','leaving');
+    result.style.animation='none';
+    void result.offsetWidth;
+    result.style.animation='';
+  }
+
+  async function returnToScanner(){
+    const result=$('#scannerResultStage');
+    result.classList.add('leaving');
+    stopScanner();
+    await new Promise(resolve=>setTimeout(resolve,150));
+    $('#scanResult').className='scan-result';
+    $('#scanResult').innerHTML='';
+    $('#manualQr').value='';
+    showScannerCaptureStage();
+    setScannerStatus('Starting rear camera...');
+    await startScanner();
+  }
+
   async function openScanner(){
     openModal('scannerModal');
     $('#scanResult').className='scan-result';
     $('#scanResult').innerHTML='';
     $('#manualQr').value='';
+    showScannerCaptureStage();
     setScannerStatus('Starting rear camera...');
     await startScanner();
   }
@@ -1107,7 +1159,12 @@
 
   $('#manualCheckBtn').addEventListener('click',async()=>{
     const token=parseQrToken($('#manualQr').value);
-    if(!token){showSimpleScanResult(false,'Invalid QR','Paste the full QR URL or a valid UUID token.');return;}
+    if(!token){
+      stopScanner();
+      showScannerResultStage();
+      showSimpleScanResult(false,'Invalid QR','Paste the full QR URL or a valid UUID token.');
+      return;
+    }
     await checkIn(token);
   });
 
@@ -1167,12 +1224,7 @@
       <div class="scan-result-note">${already?'This guest was already checked in. Their allocated seat remains unchanged.':'Admission confirmed. RSVP details are shown below.'}</div>
       <div class="scan-details">${details}</div>`;
 
-    $('#scanAnotherBtn').addEventListener('click',()=>{
-      box.className='scan-result';
-      box.innerHTML='';
-      $('#manualQr').value='';
-      startScanner();
-    });
+    $('#scanAnotherBtn').addEventListener('click',returnToScanner);
   }
 
   function showSimpleScanResult(ok,title,message,type=''){
@@ -1186,17 +1238,13 @@
         <p style="margin-top:8px">${esc(message)}</p>
       </div>
       <div class="scan-actions"><button id="scanAnotherBtn" class="outline-btn">Scan Another Guest</button></div>`;
-    $('#scanAnotherBtn').addEventListener('click',()=>{
-      box.className='scan-result';
-      box.innerHTML='';
-      $('#manualQr').value='';
-      startScanner();
-    });
+    $('#scanAnotherBtn').addEventListener('click',returnToScanner);
   }
 
   async function checkIn(token){
     stopScanner();
     setScannerStatus('Verifying invitation...');
+    showScannerResultStage();
     const box=$('#scanResult');
     box.className='scan-result show success';
     box.innerHTML=`<div class="scan-hero"><div class="scan-kicker">QR detected</div><h4 style="color:var(--gold-soft)">Checking invitation</h4><p style="margin-top:8px">Please wait while the guest is verified.</p></div>`;
