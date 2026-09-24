@@ -259,6 +259,11 @@
     .scan-kicker{font-size:9px;text-transform:uppercase;letter-spacing:1.8px;font-weight:800;color:var(--gold);margin-bottom:8px}
     .scan-name{font-family:"Cormorant Garamond",serif;font-size:38px;line-height:.98;color:var(--ivory);font-weight:700;margin:0 0 8px}
     .scan-number{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--gold-soft);font-weight:800;font-size:12px;letter-spacing:.4px}
+    .scan-seat{margin-top:14px;display:inline-flex;align-items:center;gap:12px;padding:11px 16px;border:1px solid rgba(201,164,100,.45);background:rgba(201,164,100,.08);border-radius:14px}
+    .scan-seat span{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);font-weight:800}
+    .scan-seat strong{font-family:"Cormorant Garamond",serif;font-size:36px;line-height:.85;color:#fff;font-weight:700}
+    .seat-badge{display:inline-flex;align-items:center;justify-content:center;min-width:66px;padding:7px 10px;border-radius:10px;border:1px solid rgba(201,164,100,.34);background:rgba(201,164,100,.08);color:var(--gold-soft);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:900;letter-spacing:.5px}
+    .export-slot{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
     .scan-details{padding:17px 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
     .scan-detail{padding:12px;border:1px solid var(--line-soft);background:#111;border-radius:12px;min-width:0}
     .scan-detail small{display:block;font-size:8px;text-transform:uppercase;letter-spacing:1.2px;font-weight:800;color:#77716b;margin-bottom:5px}
@@ -266,7 +271,7 @@
     .scan-detail.full{grid-column:1/-1}
     .scan-actions{padding:0 20px 20px;display:flex;gap:9px;flex-wrap:wrap}
     .scan-actions .outline-btn,.scan-actions .gold-btn{flex:1;min-width:160px}
-    @media(max-width:650px){.scanner-box{aspect-ratio:3/4;max-height:62vh}.scanner-frame{width:min(76%,300px)}.scan-details{grid-template-columns:1fr}.scan-detail.full{grid-column:auto}.scan-name{font-size:34px}}
+    @media(max-width:650px){.scanner-box{aspect-ratio:3/4;max-height:62vh}.scanner-frame{width:min(76%,300px)}.scan-details{grid-template-columns:1fr}.scan-detail.full{grid-column:auto}.scan-name{font-size:34px}.scan-seat strong{font-size:32px}}
 
     .modal-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--line-soft)}
     .danger-zone{margin-top:22px;padding:18px;border:1px solid rgba(168,91,102,.35);background:rgba(168,91,102,.06);border-radius:15px}
@@ -424,15 +429,15 @@
         </section>
 
         <section id="view-guests" class="view">
-          <div class="hero-row"><div><div class="page-kicker">RSVP directory</div><h2 class="page-title">Guest List</h2><p class="page-sub">Search every response, open complete RSVP details, manage payment status and monitor check-in.</p></div></div>
+          <div class="hero-row"><div><div class="page-kicker">RSVP directory</div><h2 class="page-title">Guest List</h2><p class="page-sub">Search every response, see automatically allocated seat numbers, create name tags, manage payment status and monitor check-in.</p></div></div>
           <div class="panel">
             <div class="toolbar">
-              <div class="search-wrap"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span><input id="guestSearch" class="dark-control" placeholder="Search name, email, phone or guest number"></div>
+              <div class="search-wrap"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span><input id="guestSearch" class="dark-control" placeholder="Search name, seat, email, phone or guest number"></div>
               <select id="attendanceFilter" class="dark-control"><option value="all">All attendance</option><option value="attending">Attending</option><option value="not_attending">Not attending</option></select>
               <select id="paymentFilter" class="dark-control"><option value="all">All payments</option><option value="pending">Pending</option><option value="paid">Paid</option><option value="waived">Waived</option><option value="refunded">Refunded</option></select>
-              <div class="export-slot"><button id="exportBtn" class="outline-btn"><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>Export CSV</button></div>
+              <div class="export-slot"><button id="printTagsBtn" class="gold-btn"><span class="icon"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7"/></svg></span>Print Name Tags</button><button id="exportBtn" class="outline-btn"><span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg></span>Export CSV</button></div>
             </div>
-            <div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>Attendance</th><th>People</th><th>Buffet due</th><th>Payment</th><th>Check in</th><th>Email</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="guestTableBody"></tbody></table><div id="guestEmpty" class="empty hidden"><div class="empty-icon"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span></div><strong>No matching guests</strong><span>Try changing your search or filters.</span></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>Seat</th><th>Attendance</th><th>People</th><th>Buffet due</th><th>Payment</th><th>Check in</th><th>Email</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="guestTableBody"></tbody></table><div id="guestEmpty" class="empty hidden"><div class="empty-icon"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></span></div><strong>No matching guests</strong><span>Try changing your search or filters.</span></div></div>
           </div>
         </section>
 
@@ -455,7 +460,7 @@
             <div class="stat-card"><div class="stat-label">Still expected</div><div id="checkRemaining" class="stat-value">0</div><div class="stat-meta">Not yet scanned</div></div>
             <div class="stat-card"><div class="stat-label">Admission rate</div><div id="checkRate" class="stat-value">0%</div><div class="stat-meta">Live event attendance</div></div>
           </div>
-          <div class="panel"><div class="panel-head"><div><h3>Recently Checked In</h3><p>Latest successful arrivals</p></div></div><div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>Type</th><th>Checked in</th><th>Action</th></tr></thead><tbody id="recentCheckinBody"></tbody></table><div id="recentEmpty" class="empty hidden"><strong>No guests checked in yet</strong><span>Successful QR scans will appear here.</span></div></div></div>
+          <div class="panel"><div class="panel-head"><div><h3>Recently Checked In</h3><p>Latest successful arrivals with allocated seats</p></div></div><div class="table-wrap"><table><thead><tr><th>Guest</th><th>Guest number</th><th>Seat</th><th>Type</th><th>Checked in</th><th>Action</th></tr></thead><tbody id="recentCheckinBody"></tbody></table><div id="recentEmpty" class="empty hidden"><strong>No guests checked in yet</strong><span>Successful QR scans will appear here.</span></div></div></div>
         </section>
 
         <section id="view-activity" class="view">
@@ -563,6 +568,8 @@
   function shortDate(v) { if(!v) return '—'; try { return new Intl.DateTimeFormat('en-ZA',{dateStyle:'medium'}).format(new Date(v)); } catch { return v; } }
   function initials(name='Guest') { return name.trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase() || 'G'; }
   function human(v='') { return String(v||'').replaceAll('_',' ').replace(/\b\w/g,m=>m.toUpperCase()); }
+  function formatSeat(v) { const n=Number(v); return Number.isFinite(n) && n>0 ? String(Math.trunc(n)).padStart(2,'0') : '—'; }
+  function seatBadge(v) { const label=formatSeat(v); return label==='—' ? '<span style="color:#777">—</span>' : `<span class="seat-badge">Seat ${esc(label)}</span>`; }
 
   function toast(title, message, type='success') {
     const n = document.createElement('div'); n.className = `toast ${type}`;
@@ -663,7 +670,7 @@
   function applyFilters() {
     const q=(el.guestSearch?.value||'').trim().toLowerCase(); const att=el.attendanceFilter?.value||'all'; const pay=el.paymentFilter?.value||'all';
     state.filtered=state.rsvps.filter(r=>{
-      const hay=[r.full_name,r.email,r.phone,r.guest_number,r.plus_one_name,r.plus_one_guest_number].filter(Boolean).join(' ').toLowerCase();
+      const hay=[r.full_name,r.email,r.phone,r.guest_number,r.seat_number,r.plus_one_name,r.plus_one_guest_number,r.plus_one_seat_number].filter(v=>v!==null&&v!==undefined&&v!=='').join(' ').toLowerCase();
       return (!q||hay.includes(q)) && (att==='all'||r.attendance===att) && (pay==='all'||r.payment_status===pay);
     }); renderGuestTable();
   }
@@ -676,6 +683,7 @@
       tr.innerHTML=`
         <td><div class="guest-cell"><div class="avatar">${esc(initials(r.full_name))}</div><div><strong>${esc(r.full_name)}</strong><span>${esc(r.email)}</span></div></div></td>
         <td><span class="guest-number">${esc(r.guest_number)}</span></td>
+        <td>${r.attendance==='attending'?`<div style="display:grid;gap:5px">${seatBadge(r.seat_number)}${r.plus_one?`<span style="font-size:9px;color:#777">Plus one: Seat ${esc(formatSeat(r.plus_one_seat_number))}</span>`:''}</div>`:'—'}</td>
         <td>${attendancePill(r.attendance)}</td><td>${people}</td><td>${r.attendance==='attending'?money(r.payment_amount):'—'}</td><td>${paymentPill(r.payment_status)}</td>
         <td>${r.attendance==='attending'?checkinPill(r.check_in_status):'—'}</td><td>${emailPill(r.guest_email_status)}</td><td>${shortDate(r.created_at)}</td>
         <td><div class="mini-actions"><button class="mini-btn" data-detail="${r.id}">Details</button>${canManage()?`<button class="mini-btn" data-edit="${r.id}">Edit</button>${r.attendance==='attending'?`<button class="mini-btn" data-payment="${r.id}">Payment</button>`:''}<button class="mini-btn" data-delete="${r.id}" style="color:#d2949d">Delete</button>`:''}</div></td>`;
@@ -693,9 +701,9 @@
   }
 
   function renderRecentCheckins() {
-    const items=[]; state.rsvps.forEach(r=>{ if(r.check_in_status==='checked_in') items.push({name:r.full_name,number:r.guest_number,type:'Primary guest',at:r.checked_in_at}); if(r.plus_one && r.plus_one_check_in_status==='checked_in') items.push({name:r.plus_one_name,number:r.plus_one_guest_number,type:'Plus one',at:r.plus_one_checked_in_at}); });
+    const items=[]; state.rsvps.forEach(r=>{ if(r.check_in_status==='checked_in') items.push({name:r.full_name,number:r.guest_number,seat:r.seat_number,type:'Primary guest',at:r.checked_in_at}); if(r.plus_one && r.plus_one_check_in_status==='checked_in') items.push({name:r.plus_one_name,number:r.plus_one_guest_number,seat:r.plus_one_seat_number,type:'Plus one',at:r.plus_one_checked_in_at}); });
     items.sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); const recent=items.slice(0,30); el.recentBody.innerHTML=''; el.recentEmpty.classList.toggle('hidden',recent.length>0);
-    recent.forEach(x=>{ const row=state.rsvps.find(r=>r.guest_number===x.number || r.plus_one_guest_number===x.number); const type=x.type==='Plus one'?'plus_one':'primary'; const tr=document.createElement('tr'); tr.innerHTML=`<td><div class="guest-cell"><div class="avatar">${esc(initials(x.name))}</div><div><strong>${esc(x.name)}</strong></div></div></td><td><span class="guest-number">${esc(x.number)}</span></td><td>${pill(x.type,x.type==='Plus one'?'info':'muted')}</td><td>${dateTime(x.at)}</td><td>${canManage()&&row?`<button class="mini-btn" data-reset-checkin="${row.id}" data-guest-type="${type}">Undo Check In</button>`:'—'}</td>`; el.recentBody.appendChild(tr); });
+    recent.forEach(x=>{ const row=state.rsvps.find(r=>r.guest_number===x.number || r.plus_one_guest_number===x.number); const type=x.type==='Plus one'?'plus_one':'primary'; const tr=document.createElement('tr'); tr.innerHTML=`<td><div class="guest-cell"><div class="avatar">${esc(initials(x.name))}</div><div><strong>${esc(x.name)}</strong></div></div></td><td><span class="guest-number">${esc(x.number)}</span></td><td>${seatBadge(x.seat)}</td><td>${pill(x.type,x.type==='Plus one'?'info':'muted')}</td><td>${dateTime(x.at)}</td><td>${canManage()&&row?`<button class="mini-btn" data-reset-checkin="${row.id}" data-guest-type="${type}">Undo Check In</button>`:'—'}</td>`; el.recentBody.appendChild(tr); });
   }
 
 
@@ -725,12 +733,12 @@
 
   function openDetail(id) {
     const r=state.rsvps.find(x=>x.id===id); if(!r) return;
-    const plusBlock=r.plus_one?`<div class="section-label">Plus One</div><div class="detail-grid"><div class="detail-item"><small>Name</small><strong>${esc(r.plus_one_name)}</strong></div><div class="detail-item"><small>Guest number</small><strong class="guest-number">${esc(r.plus_one_guest_number)}</strong></div><div class="detail-item"><small>Check in</small><strong>${human(r.plus_one_check_in_status)}</strong></div><div class="detail-item"><small>Checked in at</small><strong>${dateTime(r.plus_one_checked_in_at)}</strong></div></div>`:'';
+    const plusBlock=r.plus_one?`<div class="section-label">Plus One</div><div class="detail-grid"><div class="detail-item"><small>Name</small><strong>${esc(r.plus_one_name)}</strong></div><div class="detail-item"><small>Guest number</small><strong class="guest-number">${esc(r.plus_one_guest_number)}</strong></div><div class="detail-item"><small>Seat number</small><strong>Seat ${esc(formatSeat(r.plus_one_seat_number))}</strong></div><div class="detail-item"><small>Check in</small><strong>${human(r.plus_one_check_in_status)}</strong></div><div class="detail-item"><small>Checked in at</small><strong>${dateTime(r.plus_one_checked_in_at)}</strong></div></div>`:'';
     el.detailBody.innerHTML=`<div class="detail-banner"><div><h4>${esc(r.full_name)}</h4><p>${esc(r.guest_number)}</p></div><div>${attendancePill(r.attendance)}</div></div>
       <div class="section-label">Contact</div><div class="detail-grid"><div class="detail-item"><small>Email</small><strong>${esc(r.email)}</strong></div><div class="detail-item"><small>Phone</small><strong>${esc(r.phone)}</strong></div><div class="detail-item"><small>Submitted</small><strong>${dateTime(r.created_at)}</strong></div><div class="detail-item"><small>Source</small><strong>${esc(r.source||'Invitation')}</strong></div></div>
       <div class="section-label">Dining Preferences</div><div class="detail-grid"><div class="detail-item"><small>Food</small><strong>${esc(r.food_choice||'Not applicable')}</strong></div><div class="detail-item"><small>Drinks</small><strong>${esc(r.drink_choice||'Not applicable')}</strong></div><div class="detail-item"><small>Wine</small><strong>${esc(r.wine_preference||'No preference')}</strong></div><div class="detail-item"><small>Photography</small><strong>${r.photography_option?'Yes · R50':'No'}</strong></div><div class="detail-item full"><small>Dietary requirements</small><strong>${esc(r.dietary_requirements||'None specified')}</strong></div></div>
       ${plusBlock}
-      <div class="section-label">Payment and Entry</div><div class="detail-grid"><div class="detail-item"><small>Buffet contribution</small><strong>${money(r.payment_amount)}</strong></div><div class="detail-item"><small>Payment status</small><strong>${human(r.payment_status)}</strong></div><div class="detail-item"><small>Payment reference</small><strong>${esc(r.payment_reference||'None')}</strong></div><div class="detail-item"><small>Payment confirmed</small><strong>${dateTime(r.payment_confirmed_at)}</strong></div><div class="detail-item"><small>Main guest check in</small><strong>${human(r.check_in_status)}</strong></div><div class="detail-item"><small>Main check in time</small><strong>${dateTime(r.checked_in_at)}</strong></div></div>
+      <div class="section-label">Payment and Entry</div><div class="detail-grid"><div class="detail-item"><small>Seat number</small><strong>Seat ${esc(formatSeat(r.seat_number))}</strong></div><div class="detail-item"><small>Buffet contribution</small><strong>${money(r.payment_amount)}</strong></div><div class="detail-item"><small>Payment status</small><strong>${human(r.payment_status)}</strong></div><div class="detail-item"><small>Payment reference</small><strong>${esc(r.payment_reference||'None')}</strong></div><div class="detail-item"><small>Payment confirmed</small><strong>${dateTime(r.payment_confirmed_at)}</strong></div><div class="detail-item"><small>Main guest check in</small><strong>${human(r.check_in_status)}</strong></div><div class="detail-item"><small>Main check in time</small><strong>${dateTime(r.checked_in_at)}</strong></div></div>
       <div class="section-label">Email Delivery</div><div class="detail-grid"><div class="detail-item"><small>Guest confirmation</small><strong>${human(r.guest_email_status)}</strong></div><div class="detail-item"><small>Nico notification</small><strong>${human(r.host_email_status)}</strong></div>${r.email_error?`<div class="detail-item full"><small>Email error</small><strong>${esc(r.email_error)}</strong></div>`:''}</div>
       ${r.message?`<div class="section-label">Message for Nico</div><div class="detail-item full"><strong>${esc(r.message)}</strong></div>`:''}
       ${canManage()?`<div class="modal-actions"><button class="outline-btn" data-edit="${r.id}">Edit RSVP</button>${r.attendance==='attending'?`<button class="gold-btn" data-payment="${r.id}">Update Payment</button>`:''}${r.check_in_status==='checked_in'?`<button class="outline-btn" data-reset-checkin="${r.id}" data-guest-type="primary">Undo Main Check In</button>`:''}${r.plus_one&&r.plus_one_check_in_status==='checked_in'?`<button class="outline-btn" data-reset-checkin="${r.id}" data-guest-type="plus_one">Undo Plus One Check In</button>`:''}<button class="danger-btn" data-delete="${r.id}">Delete RSVP</button></div>`:''}`;
@@ -843,9 +851,25 @@
   $('#exportBtn').addEventListener('click',()=>{
     const rows=state.filtered;
     if(!rows.length){toast('Nothing to export','No guests match the current filters.','warning');return;}
-    const headers=['Guest Number','Full Name','Email','Phone','Attendance','Plus One','Plus One Name','Plus One Number','Food','Drinks','Wine','Dietary Requirements','Photography','Buffet Amount','Payment Status','Payment Reference','Main Check In','Plus One Check In','Guest Email','Host Email','Submitted'];
-    const values=rows.map(r=>[r.guest_number,r.full_name,r.email,r.phone,r.attendance,r.plus_one?'Yes':'No',r.plus_one_name||'',r.plus_one_guest_number||'',r.food_choice||'',r.drink_choice||'',r.wine_preference||'',r.dietary_requirements||'',r.photography_option?'Yes':'No',r.payment_amount,r.payment_status,r.payment_reference||'',r.check_in_status,r.plus_one_check_in_status||'',r.guest_email_status,r.host_email_status,r.created_at]);
+    const headers=['Guest Number','Seat Number','Full Name','Email','Phone','Attendance','Plus One','Plus One Name','Plus One Number','Plus One Seat Number','Food','Drinks','Wine','Dietary Requirements','Photography','Buffet Amount','Payment Status','Payment Reference','Main Check In','Plus One Check In','Guest Email','Host Email','Submitted'];
+    const values=rows.map(r=>[r.guest_number,formatSeat(r.seat_number),r.full_name,r.email,r.phone,r.attendance,r.plus_one?'Yes':'No',r.plus_one_name||'',r.plus_one_guest_number||'',r.plus_one?formatSeat(r.plus_one_seat_number):'',r.food_choice||'',r.drink_choice||'',r.wine_preference||'',r.dietary_requirements||'',r.photography_option?'Yes':'No',r.payment_amount,r.payment_status,r.payment_reference||'',r.check_in_status,r.plus_one_check_in_status||'',r.guest_email_status,r.host_email_status,r.created_at]);
     const csv=[headers,...values].map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\r\n'); const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`nico-rsvp-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url); toast('CSV exported',`${rows.length} RSVP records were exported.`);
+  });
+
+  $('#printTagsBtn')?.addEventListener('click',()=>{
+    const guests=[];
+    state.rsvps.filter(r=>r.attendance==='attending').forEach(r=>{
+      if(r.seat_number) guests.push({name:r.full_name,seat:r.seat_number,number:r.guest_number,type:'Guest'});
+      if(r.plus_one && r.plus_one_seat_number) guests.push({name:r.plus_one_name,seat:r.plus_one_seat_number,number:r.plus_one_guest_number,type:'Plus One'});
+    });
+    guests.sort((a,b)=>Number(a.seat)-Number(b.seat));
+    if(!guests.length){toast('No allocated seats','Run the seat-number SQL first, then refresh the dashboard.','warning');return;}
+
+    const win=window.open('','_blank');
+    if(!win){toast('Pop-up blocked','Allow pop-ups for this page to print name tags.','warning');return;}
+    const cards=guests.map(g=>`<article class="tag"><div class="event">Nico's Birthday Celebration</div><div class="name">${esc(g.name)}</div><div class="seat">Seat number ${esc(formatSeat(g.seat))}</div><div class="guestno">${esc(g.number||'')}</div></article>`).join('');
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Nico Name Tags</title><style>@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#111}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10mm}.tag{min-height:82mm;border:1.5px solid #c9a464;padding:12mm;display:flex;flex-direction:column;justify-content:center;text-align:center;break-inside:avoid}.event{font-size:9pt;letter-spacing:2px;text-transform:uppercase;color:#9a763d;font-weight:700}.name{font-family:Georgia,serif;font-size:25pt;font-weight:700;margin:9mm 0 5mm}.seat{font-size:18pt;font-weight:800}.guestno{margin-top:5mm;font-family:monospace;font-size:9pt;color:#777}@media print{button{display:none}}</style></head><body><div class="grid">${cards}</div><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
+    win.document.close();
   });
 
   $$('[data-open-scanner]').forEach(b=>b.addEventListener('click',openScanner));
@@ -1048,8 +1072,11 @@
     const heroClass=already?'warning':'success';
     const statusTitle=already?'Already Checked In':'Guest Checked In';
     const checkTime=dateTime(data.checked_in_at);
+    const allocatedSeat=data.seat_number ?? (isPlus?rsvp?.plus_one_seat_number:rsvp?.seat_number);
+    const seatLabel=data.seat_label || formatSeat(allocatedSeat);
 
     let details='';
+    details+=scanDetail('Seat number',seatLabel==='—'?'Not allocated':`Seat ${seatLabel}`);
     details+=scanDetail('Guest type',isPlus?'Plus one':'Primary guest');
     details+=scanDetail('Check in',already?`Already admitted · ${checkTime}`:`Admitted now · ${checkTime}`);
 
@@ -1079,6 +1106,7 @@
         <div class="scan-kicker">${esc(statusTitle)}</div>
         <div class="scan-name">${esc(data.full_name||'Guest')}</div>
         <div class="scan-number">${esc(data.guest_number||'')}</div>
+        <div class="scan-seat"><span>Allocated seat</span><strong>${seatLabel==='—'?'Not set':`Seat ${esc(seatLabel)}`}</strong></div>
       </div>
       <div class="scan-details">${details}</div>
       <div class="scan-actions"><button id="scanAnotherBtn" class="gold-btn">Scan Another Guest</button></div>`;
